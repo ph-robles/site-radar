@@ -23,7 +23,7 @@ async function fetchWithTimeout(url: string, opts: RequestInit & { timeoutMs?: n
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
-    const res = await fetch(url, { ...rest, signal: ctrl.signal, agent: httpsAgent });
+    const res = await fetch(url, { ...rest, signal: ctrl.signal });
     return res;
   } finally {
     clearTimeout(t);
