@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+export const runtime = 'nodejs';
+const UA = 'SiteRadar/1.0 (contato: ph.robles33@gmail.com)';
 
 // Cache em memória simples (apenas em dev) para evitar chamadas repetidas
 // (reinicia a cada reload do servidor)
