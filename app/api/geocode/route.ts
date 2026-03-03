@@ -1,6 +1,9 @@
 export const runtime = 'nodejs';
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d68353bc3454c3ef0c50a0fca4f17eac27d658de
 // 🚧 DEV APENAS: permita TLS inseguro se setado em env (NÃO USE EM PRODUÇÃO)
 if (process.env.ALLOW_INSECURE_TLS === '1') {
   // eslint-disable-next-line no-process-env

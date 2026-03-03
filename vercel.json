@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 {
   "functions": {
@@ -6,3 +7,13 @@
     }
   }
 }
+=======
+
+{
+  "functions": {
+    "app/api/**/route.js": {
+      "regions": ["gru1"]
+    }
+  }
+}
+>>>>>>> d68353bc3454c3ef0c50a0fca4f17eac27d658de
