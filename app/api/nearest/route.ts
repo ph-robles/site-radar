@@ -5,25 +5,33 @@ import { NextResponse } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
-// helper agora é async
+// helper agora é async e usa get/set/remove (sem getAll)
 async function getSupabaseServer() {
-  const cookieStore = await cookies(); // <<-- AQUI é o conserto: aguarda o Promise<ReadonlyRequestCookies>
+  const cookieStore = await cookies(); // Next 16: cookies() é Promise<ReadonlyRequestCookies>
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    // use a sua publishable/anon key; mantenha o MESMO nome de env que você configurou na Vercel
+    // Use a chave que você configurou na Vercel (mantenha o MESMO nome)
     (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)!,
     {
       cookies: {
-        getAll() {
-          return cookieStore.getAll();
+        get(name: string) {
+          return cookieStore.get(name);
         },
-        setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
+        set(name: string, value: string, options: CookieOptions) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+            cookieStore.set(name, value, options);
           } catch {
-            // chamada feita a partir de Server Component — sem problema; middleware/SSR cuidam do refresh
+            // Chamado de Server Component: ignorar, middleware/SSR cuidam do refresh
+          }
+        },
+        remove(name: string, options: CookieOptions) {
+          try {
+            // Remoção = set com expiração no passado
+            cookieStore.set(name, '', { ...options, expires: new Date(0) });
+          } catch {
+            // idem acima
           }
         },
       },
@@ -39,7 +47,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Parâmetros inválidos' }, { status: 400 });
     }
 
-    const supabase = await getSupabaseServer(); // <<-- também precisa de await aqui
+    const supabase = await getSupabaseServer();
 
     // chama a RPC criada no banco
     const { data, error } = await supabase.rpc('nearest_sites', { p_lon: lon, p_lat: lat });
@@ -52,3 +60,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: e?.message ?? 'Erro inesperado' }, { status: 500 });
   }
 }
+
