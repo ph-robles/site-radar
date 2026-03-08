@@ -1,21 +1,13 @@
+// app/api/geocode/route.ts
 export const runtime = 'nodejs';
 
-//<<<<<<< HEAD
-
-//=======
-//>>>>>>> d68353bc3454c3ef0c50a0fca4f17eac27d658de
 // 🚧 DEV APENAS: permita TLS inseguro se setado em env (NÃO USE EM PRODUÇÃO)
 if (process.env.ALLOW_INSECURE_TLS === '1') {
   // eslint-disable-next-line no-process-env
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
 
-
 import { NextResponse } from 'next/server';
-import https from 'node:https';
-
-// Agent IPv4 + keep-alive
-const httpsAgent = new https.Agent({ family: 4, keepAlive: true });
 
 // Cache em memória simples (dev)
 const memCache = new Map<string, { ts: number; payload: any }>();
@@ -26,7 +18,7 @@ async function fetchWithTimeout(url: string, opts: RequestInit & { timeoutMs?: n
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
-    const res = await fetch(url, { ...rest, signal: ctrl.signal });
+    const res = await fetch(url, { ...rest, signal: ctrl.signal, cache: 'no-store' });
     return res;
   } finally {
     clearTimeout(t);
@@ -34,22 +26,23 @@ async function fetchWithTimeout(url: string, opts: RequestInit & { timeoutMs?: n
 }
 
 async function fetchNominatim(url: string, tries = 3) {
-  const UA = 'SiteRadar/1.0 (contato: seu-email@exemplo.com)'; // <-- altere para um e-mail seu
-  let lastErr: any = null;
+  // ⚠️ Troque para um e-mail seu real (política do Nominatim exige User-Agent identificável)
+  const UA = 'SiteRadar/1.0 (contato: ph.robles33@gmail.com)';
 
+  let lastErr: any = null;
   for (let i = 0; i < tries; i++) {
     try {
       const res = await fetchWithTimeout(url, {
         headers: {
-          'User-Agent': UA,            // obrigatório por política do Nominatim
+          'User-Agent': UA,
           'Accept': 'application/json',
         },
-        cache: 'no-store',
         timeoutMs: 8000 + i * 2000,
       });
 
       if (!res.ok) {
         const text = await res.text().catch(() => '');
+        // 429 = too many requests → tenta de novo com pequeno atraso
         if (res.status === 429 && i < tries - 1) {
           await new Promise(r => setTimeout(r, 500 + i * 800));
           continue;
