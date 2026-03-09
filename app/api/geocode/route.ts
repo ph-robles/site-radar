@@ -18,7 +18,7 @@ export async function GET(req: Request) {
     url.searchParams.set("addressdetails", "1");
 
     const res = await fetch(url.toString(), {
-      headers: { "User-Agent": "SiteRadar/1.0 (raphael@exemplo.com)" }, // <— troque para seu e-mail
+      headers: { "User-Agent": "SiteRadar/1.0 (ph.robles33@gmail.com)" }, // <— troque para seu e-mail
       // Evita cache agressivo no edge/CDN:
       next: { revalidate: 0 },
     });
