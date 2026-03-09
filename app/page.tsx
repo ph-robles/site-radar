@@ -1,9 +1,11 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { LocateFixed, Search, Info } from "lucide-react";
 
 export default function HomePage() {
+  const router = useRouter();
   const [loadingGeo, setLoadingGeo] = useState(false);
   const [errorGeo, setErrorGeo] = useState<string | null>(null);
 
@@ -18,7 +20,8 @@ export default function HomePage() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
-        window.location.href = `/buscar/perto-de-mim?lat=${latitude}&lng=${longitude}`;
+        // use router.push para manter o SPA estável
+        router.push(`/buscar/perto-de-mim?lat=${latitude}&lng=${longitude}`);
       },
       (err) => {
         setLoadingGeo(false);
@@ -78,7 +81,7 @@ export default function HomePage() {
         {errorGeo && <p className="mt-3 text-sm text-red-600">{errorGeo}</p>}
 
         <div className="mt-6">
-          <Link href="/sobre" className="inline-flex items-center gap-1 text-sm text-gray-700 hover:underline">
+          <Link href="/sobre" className="inline-flex items-center gap-2 text-emerald-700 hover:underline">
             <Info className="w-4 h-4" />
             Sobre o projeto
           </Link>
