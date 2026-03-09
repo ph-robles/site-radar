@@ -12,18 +12,21 @@ export default function HomePage() {
   const handlePertoDeMim = () => {
     setErrorGeo(null);
     setLoadingGeo(true);
-    if (!navigator.geolocation) {
+
+    if (!("geolocation" in navigator)) {
       setErrorGeo("Geolocalização não é suportada neste navegador.");
       setLoadingGeo(false);
       return;
     }
+
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
-        // use router.push para manter o SPA estável
+        console.log("[Geo] Sucesso:", { latitude, longitude });
         router.push(`/buscar/perto-de-mim?lat=${latitude}&lng=${longitude}`);
       },
       (err) => {
+        console.warn("[Geo] Erro:", err);
         setLoadingGeo(false);
         if (err.code === err.PERMISSION_DENIED) setErrorGeo("Permissão de localização negada.");
         else if (err.code === err.POSITION_UNAVAILABLE) setErrorGeo("Localização indisponível.");
@@ -81,7 +84,7 @@ export default function HomePage() {
         {errorGeo && <p className="mt-3 text-sm text-red-600">{errorGeo}</p>}
 
         <div className="mt-6">
-          <Link href="/sobre" className="inline-flex items-center gap-2 text-emerald-700 hover:underline">
+          <Link href="/sobre" className="inline-flex items-center gap-1 text-emerald-700 hover:underline">
             <Info className="w-4 h-4" />
             Sobre o projeto
           </Link>
