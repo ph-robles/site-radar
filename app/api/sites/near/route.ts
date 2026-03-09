@@ -1,5 +1,9 @@
+// app/api/sites/near/route.ts
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET(req: Request) {
   try {
@@ -9,7 +13,7 @@ export async function GET(req: Request) {
     const radius = parseInt(searchParams.get("radius") || "5000", 10);
     const limit = parseInt(searchParams.get("limit") || "20", 10);
 
-    if (Number.isNaN(lat) || Number.isNaN(lng)) {
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
       return NextResponse.json({ error: "Parâmetros lat/lng inválidos." }, { status: 400 });
     }
 
@@ -21,8 +25,9 @@ export async function GET(req: Request) {
     });
 
     if (error) throw error;
+
     return NextResponse.json({ sites: data ?? [] }, { headers: { "Cache-Control": "no-store" } });
   } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ error: e.message ?? "Erro ao buscar ERBs próximas." }, { status: 500 });
   }
 }

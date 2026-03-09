@@ -1,4 +1,8 @@
+// app/api/geocode/route.ts
 import { NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET(req: Request) {
   try {
@@ -6,6 +10,7 @@ export async function GET(req: Request) {
     const q = (searchParams.get("q") || "").trim();
     if (!q) return NextResponse.json({});
 
+    // Nominatim (OSM): gratuito, sem chave. Use um User-Agent identificável.
     const url = new URL("https://nominatim.openstreetmap.org/search");
     url.searchParams.set("format", "jsonv2");
     url.searchParams.set("q", q);
@@ -13,7 +18,8 @@ export async function GET(req: Request) {
     url.searchParams.set("addressdetails", "1");
 
     const res = await fetch(url.toString(), {
-      headers: { "User-Agent": "SiteRadar/1.0 (ph.robles33@gmail.com)" },
+      headers: { "User-Agent": "SiteRadar/1.0 (raphael@exemplo.com)" }, // <— troque para seu e-mail
+      // Evita cache agressivo no edge/CDN:
       next: { revalidate: 0 },
     });
 
@@ -28,6 +34,6 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ lat, lng, label }, { headers: { "Cache-Control": "no-store" } });
   } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ error: e.message ?? "Erro no geocoding." }, { status: 500 });
   }
 }
