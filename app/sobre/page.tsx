@@ -11,7 +11,7 @@ export default function SobrePage() {
         <li><strong>Endereço:</strong> geocodifica o texto e encontra as ERBs mais próximas.</li>
         <li><strong>Perto de mim:</strong> usa sua localização (com permissão).</li>
       </ul>
-      <p>Feito por Raphael — v1.0</p>
+      <p>Feito por Raphael Robles — v1.0</p>
     </section>
   );
 }
