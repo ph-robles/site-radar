@@ -1,188 +1,83 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import { useDebounce } from '@/hooks/useDebounce';
-import { searchSites, type Site } from '@/services/sites';
-
-/**
- * Tipo EXATO que a RPC `nearest_sites` retorna.
- * Mantém nullability coerente com o banco e elimina os erros de TS.
- */
-type NearestSite = {
-  id: number;
-  sigla: string | null;
-  nome: string | null;
-  endereco: string | null;
-  detentora: string | null;
-  lat: number | null;
-  lon: number | null;
-  distancia_m: number; // metros
-};
+"use client";
+import Link from "next/link";
+import { useState } from "react";
+import { LocateFixed, Search, Info } from "lucide-react";
 
 export default function HomePage() {
-  // Busca por texto (já existente)
-  const [query, setQuery] = useState('');
-  const debounced = useDebounce(query, 400);
-  const [results, setResults] = useState<Site[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loadingGeo, setLoadingGeo] = useState(false);
+  const [errorGeo, setErrorGeo] = useState<string | null>(null);
 
-  // "Perto de mim"
-  const [locLoading, setLocLoading] = useState(false);
-  const [nearby, setNearby] = useState<NearestSite[]>([]);
-
-  // --- Busca por texto ---
-  useEffect(() => {
-    let active = true;
-    async function run() {
-      if (!debounced.trim()) {
-        setResults([]);
-        return;
-      }
-      setLoading(true);
-      const { data, error } = await searchSites(debounced);
-      if (active) {
-        if (error) {
-          console.error('Erro ao buscar sites:', error);
-          setResults([]);
-        } else {
-          setResults(data);
-        }
-        setLoading(false);
-      }
+  const handlePertoDeMim = () => {
+    setErrorGeo(null);
+    setLoadingGeo(true);
+    if (!navigator.geolocation) {
+      setErrorGeo("Geolocalização não é suportada neste navegador.");
+      setLoadingGeo(false);
+      return;
     }
-    run();
-    return () => {
-      active = false;
-    };
-  }, [debounced]);
-
-  // --- Perto de mim ---
-  async function handleNearMe() {
-    try {
-      setLocLoading(true);
-      setNearby([]);
-
-      // 1) Pegar posição atual do navegador (Geolocation API)
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          timeout: 15000,
-          maximumAge: 0,
-        });
-      });
-
-      const { latitude: lat, longitude: lon, accuracy } = position.coords;
-      console.log('Minha posição:', lat, lon, '±', accuracy, 'm');
-
-      // 2) Chamar a rota /api/nearest
-      const resp = await fetch('/api/nearest', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lat, lon }),
-      });
-
-      if (!resp.ok) {
-        const txt = await resp.text().catch(() => '');
-        throw new Error(`Falha /api/nearest: ${resp.status} - ${txt?.slice(0, 200)}`);
-      }
-
-      const json = (await resp.json()) as { data: NearestSite[] };
-      setNearby(Array.isArray(json.data) ? json.data : []);
-    } catch (err: any) {
-      alert('Não consegui obter sua localização ou buscar sites próximos. Verifique permissões e tente novamente.');
-      console.error(err);
-    } finally {
-      setLocLoading(false);
-    }
-  }
-
-  // --- Deeplinks de navegação ---
-  function openGoogleMaps(lat: number, lon: number) {
-    // https://developers.google.com/maps/documentation/urls/get-started
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
-    window.open(url, '_blank');
-  }
-
-  function openWaze(lat: number, lon: number) {
-    // https://developers.google.com/waze/deeplinks/
-    const url = `https://waze.com/ul?ll=${lat}%2C${lon}&navigate=yes&zoom=17`;
-    window.open(url, '_blank');
-  }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        window.location.href = `/buscar/perto-de-mim?lat=${latitude}&lng=${longitude}`;
+      },
+      (err) => {
+        setLoadingGeo(false);
+        if (err.code === err.PERMISSION_DENIED) setErrorGeo("Permissão de localização negada.");
+        else if (err.code === err.POSITION_UNAVAILABLE) setErrorGeo("Localização indisponível.");
+        else if (err.code === err.TIMEOUT) setErrorGeo("Tempo esgotado ao obter localização.");
+        else setErrorGeo("Erro ao obter localização.");
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+  };
 
   return (
-    <main className="mx-auto max-w-2xl p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">Buscar Sites</h1>
+    <section className="py-10">
+      <div className="max-w-3xl mx-auto text-center">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+          Encontre Sites/ERBs por <span className="text-emerald-700">sigla</span>,{" "}
+          <span className="text-emerald-700">endereço</span> ou{" "}
+          <span className="text-emerald-700">perto de você</span>
+        </h1>
+        <p className="mt-3 text-gray-600">
+          Rápido, simples e preciso — feito para o dia a dia do técnico em campo.
+        </p>
 
-      {/* --- Busca por texto --- */}
-      <div className="space-y-2">
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Digite sigla ou nome..."
-          className="w-full border rounded px-3 py-2"
-        />
-        {loading && <p className="text-sm text-gray-500">Buscando...</p>}
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <button
+            onClick={handlePertoDeMim}
+            className="rounded-lg border bg-white p-5 text-left hover:shadow-md transition flex flex-col items-center gap-2"
+            disabled={loadingGeo}
+          >
+            <LocateFixed className="w-6 h-6 text-emerald-700" />
+            <div className="font-semibold">
+              {loadingGeo ? "Localizando..." : "Perto de mim"}
+            </div>
+            <div className="text-xs text-gray-600">Usa sua localização atual</div>
+          </button>
 
-        <ul className="space-y-2">
-          {results.map((s) => (
-            <li key={s.id} className="border p-3 rounded">
-              <div className="font-medium">{s.nome}</div>
-              <div className="text-sm text-gray-600">{s.sigla}</div>
-            </li>
-          ))}
-        </ul>
+          /buscar/sigla
+            <Search className="w-6 h-6 text-emerald-700" />
+            <div className="font-semibold">Buscar por sigla</div>
+            <div className="text-xs text-gray-600">Ex.: RJO001, NIT-ABC</div>
+          </Link>
 
-        {!loading && debounced && results.length === 0 && (
-          <p className="text-sm text-gray-500">Nada encontrado.</p>
-        )}
+          /buscar/endereco
+            <Search className="w-6 h-6 text-emerald-700" />
+            <div className="font-semibold">Buscar por endereço</div>
+            <div className="text-xs text-gray-600">Digite o endereço do cliente</div>
+          </Link>
+        </div>
+
+        {errorGeo && <p className="mt-3 text-sm text-red-600">{errorGeo}</p>}
+
+        <div className="mt-6">
+          /sobre
+            <Info className="w-4 h-4" />
+            Sobre o projeto
+          </Link>
+        </div>
       </div>
-
-      {/* --- Perto de mim (3) --- */}
-      <div className="pt-4 border-t">
-        <button
-          onClick={handleNearMe}
-          disabled={locLoading}
-          className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-60"
-        >
-          {locLoading ? 'Localizando...' : 'Perto de mim (3)'}
-        </button>
-
-        {nearby.length > 0 && (
-          <ul className="mt-4 space-y-2">
-            {nearby.map((s) => (
-              <li key={s.id} className="border p-3 rounded">
-                <div className="font-medium">{s.nome ?? s.sigla ?? 'Site'}</div>
-                <div className="text-sm text-gray-600">{s.endereco ?? 'Sem endereço'}</div>
-
-                <div className="text-sm">
-                  Distância: <strong>{Math.round(s.distancia_m)} m</strong>
-                </div>
-
-                <div className="flex gap-2 mt-2">
-                  {s.lat != null && s.lon != null && (
-                    <>
-                      <button
-                        onClick={() => openGoogleMaps(s.lat!, s.lon!)}
-                        className="px-3 py-1 rounded bg-green-600 text-white"
-                      >
-                        Abrir no Google Maps
-                      </button>
-
-                      <button
-                        onClick={() => openWaze(s.lat!, s.lon!)}
-                        className="px-3 py-1 rounded bg-purple-600 text-white"
-                      >
-                        Abrir no Waze
-                      </button>
-                    </>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </main>
+    </section>
   );
 }
-``
