@@ -56,13 +56,19 @@ export default function HomePage() {
             <div className="text-xs text-gray-600">Usa sua localização atual</div>
           </button>
 
-          /buscar/sigla
+          <Link
+            href="/buscar/sigla"
+            className="rounded-lg border bg-white p-5 text-left hover:shadow-md transition flex flex-col items-center gap-2"
+          >
             <Search className="w-6 h-6 text-emerald-700" />
             <div className="font-semibold">Buscar por sigla</div>
             <div className="text-xs text-gray-600">Ex.: RJO001, NIT-ABC</div>
           </Link>
 
-          /buscar/endereco
+          <Link
+            href="/buscar/endereco"
+            className="rounded-lg border bg-white p-5 text-left hover:shadow-md transition flex flex-col items-center gap-2"
+          >
             <Search className="w-6 h-6 text-emerald-700" />
             <div className="font-semibold">Buscar por endereço</div>
             <div className="text-xs text-gray-600">Digite o endereço do cliente</div>
@@ -72,7 +78,7 @@ export default function HomePage() {
         {errorGeo && <p className="mt-3 text-sm text-red-600">{errorGeo}</p>}
 
         <div className="mt-6">
-          /sobre
+          <Link href="/sobre" className="inline-flex items-center gap-1 text-sm text-gray-700 hover:underline">
             <Info className="w-4 h-4" />
             Sobre o projeto
           </Link>

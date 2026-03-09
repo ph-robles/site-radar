@@ -7,7 +7,7 @@ type Site = {
   endereco: string | null;
   lat: number | null;
   lon: number | null;
-  distancia_m?: number; // opcional, quando vier da busca por proximidade
+  distancia_m?: number;
 };
 
 export default function SiteCard({ site }: { site: Site }) {
