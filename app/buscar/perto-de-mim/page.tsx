@@ -1,58 +1,68 @@
 "use client";
-
+ 
 import { Suspense, useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import dynamicimport from "next/dynamic";
+import dynamicImport from "next/dynamic";
 import SiteCard from "@/components/SiteCard";
 import type { SiteNear } from "@/components/ErbMap";
-
-// Evita SSG/Export — essa rota depende do client (search params / geolocalização)
+ 
+// Evita SSG/Export — essa rota depende do client
 export const dynamic = "force-dynamic";
-
+ 
 // Leaflet/React-Leaflet só no cliente
-const ErbMap = dynamicimport(() => import("@/components/ErbMap"), { ssr: false });
-
+const ErbMap = dynamicImport(() => import("@/components/ErbMap"), { ssr: false });
+ 
 export default function PertoDeMimPage() {
   return (
     <section className="py-8 max-w-5xl mx-auto">
       <h2 className="text-2xl font-semibold mb-4">ERBs próximas</h2>
-      {/* Suspense é obrigatório quando usamos useSearchParams no App Router */}
+ 
       <Suspense fallback={<p className="text-sm text-gray-600">Carregando…</p>}>
         <Inner />
       </Suspense>
     </section>
   );
 }
-
+ 
 function Inner() {
   const router = useRouter();
   const params = useSearchParams();
-
+ 
   const { latStr, lngStr } = useMemo(() => {
-    return { latStr: params.get("lat"), lngStr: params.get("lng") };
+    return {
+      latStr: params.get("lat"),
+      lngStr: params.get("lng"),
+    };
   }, [params]);
-
+ 
   const nlat = latStr ? Number(latStr) : NaN;
   const nlng = lngStr ? Number(lngStr) : NaN;
-
+ 
   const [loading, setLoading] = useState(true);
   const [sites, setSites] = useState<SiteNear[]>([]);
   const [error, setError] = useState<string | null>(null);
-
+ 
   const fetchSites = useCallback(async (lat: number, lng: number) => {
     const url = `/api/sites/near?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&radius=5000`;
+ 
     const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) throw new Error(`Falha ao buscar ERBs próximas. HTTP ${res.status}`);
+ 
+    if (!res.ok) {
+      throw new Error(`Falha ao buscar ERBs próximas. HTTP ${res.status}`);
+    }
+ 
     const data: { sites?: SiteNear[] } = await res.json();
+ 
     setSites(Array.isArray(data.sites) ? data.sites : []);
   }, []);
-
+ 
   useEffect(() => {
     (async () => {
       if (!Number.isFinite(nlat) || !Number.isFinite(nlng)) {
         setLoading(false);
-        return; // Sem coordenadas na URL → exibe botão para detectar
+        return;
       }
+ 
       try {
         await fetchSites(nlat, nlng);
       } catch (e: unknown) {
@@ -63,15 +73,17 @@ function Inner() {
       }
     })();
   }, [nlat, nlng, fetchSites]);
-
+ 
   const detectarAqui = () => {
     setError(null);
     setLoading(true);
+ 
     if (!("geolocation" in navigator)) {
       setError("Geolocalização não é suportada neste navegador.");
       setLoading(false);
       return;
     }
+ 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
@@ -79,17 +91,24 @@ function Inner() {
       },
       (err) => {
         setLoading(false);
-        if (err.code === err.PERMISSION_DENIED) setError("Permissão de localização negada.");
-        else if (err.code === err.POSITION_UNAVAILABLE) setError("Localização indisponível.");
-        else if (err.code === err.TIMEOUT) setError("Tempo esgotado ao obter localização.");
+ 
+        if (err.code === err.PERMISSION_DENIED)
+          setError("Permissão de localização negada.");
+        else if (err.code === err.POSITION_UNAVAILABLE)
+          setError("Localização indisponível.");
+        else if (err.code === err.TIMEOUT)
+          setError("Tempo esgotado ao obter localização.");
         else setError("Erro ao obter localização.");
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
   };
-
-  const userPoint = Number.isFinite(nlat) && Number.isFinite(nlng) ? { lat: nlat, lng: nlng } : null;
-
+ 
+  const userPoint =
+    Number.isFinite(nlat) && Number.isFinite(nlng)
+      ? { lat: nlat, lng: nlng }
+      : null;
+ 
   return (
     <>
       {!userPoint && !loading && (
@@ -97,6 +116,7 @@ function Inner() {
           <p className="text-sm text-gray-700">
             Parece que você acessou esta página sem fornecer a sua localização.
           </p>
+ 
           <button
             onClick={detectarAqui}
             className="rounded-md bg-emerald-600 text-white px-4 py-2 hover:bg-emerald-700"
@@ -105,20 +125,26 @@ function Inner() {
           </button>
         </div>
       )}
-
+ 
       {loading && <p className="text-sm text-gray-600">Carregando...</p>}
       {error && <p className="text-sm text-red-600">{error}</p>}
-
+ 
       {userPoint && (
         <div className="mb-6">
-          <ErbMap user={userPoint} sites={sites} className="h-80 rounded-lg overflow-hidden shadow" />
+          <ErbMap
+            user={userPoint}
+            sites={sites}
+            className="h-80 rounded-lg overflow-hidden shadow"
+          />
         </div>
       )}
-
+ 
       {!loading && !error && sites.length === 0 && userPoint && (
-        <p className="text-sm text-gray-600">Nenhuma ERB encontrada neste raio.</p>
+        <p className="text-sm text-gray-600">
+          Nenhuma ERB encontrada neste raio.
+        </p>
       )}
-
+ 
       <div className="mt-4 grid gap-3">
         {sites.map((s) => (
           <SiteCard key={s.id} site={s} />
