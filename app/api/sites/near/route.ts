@@ -6,9 +6,10 @@ type SiteNear = {
   sigla: string;
   nome: string | null;
   endereco: string | null;
-  lat: number;
-  lon: number;
+  lat: number | null;
+  lon: number | null;
   distancia_m: number;
+  capacitado: string | null;
 };
  
 export async function GET(req: NextRequest) {
@@ -26,52 +27,30 @@ export async function GET(req: NextRequest) {
       );
     }
  
-    // Busca dados no Supabase
-    const { data, error } = await supabase
-      .from("sites")
-      .select("id,sigla,nome,endereco,lat,lon");
+    // chama a função do banco
+    const { data, error } = await supabase.rpc("nearby_sites", {
+      user_lat: lat,
+      user_lng: lng,
+      radius_m: radius,
+    });
  
     if (error) {
-      return NextResponse.json({ sites: [], error: error.message }, { status: 500 });
+      return NextResponse.json(
+        { sites: [], error: error.message },
+        { status: 500 }
+      );
     }
  
-    // calcular distância
-    const sites = (data || [])
-      .map((s) => {
-        const dist = getDistance(lat, lng, s.lat, s.lon);
+    return NextResponse.json(
+      { sites: data ?? [] },
+      { status: 200 }
+    );
  
-        return {
-          ...s,
-          distancia_m: dist,
-        };
-      })
-      .filter((s) => s.distancia_m <= radius)
-      .sort((a, b) => a.distancia_m - b.distancia_m);
- 
-    return NextResponse.json({ sites });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Erro interno";
-    return NextResponse.json({ sites: [], error: msg }, { status: 500 });
+    return NextResponse.json(
+      { sites: [], error: msg },
+      { status: 500 }
+    );
   }
-}
- 
-/* calcular distância entre coordenadas */
-function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
-  const R = 6371000;
- 
-  const toRad = (x: number) => (x * Math.PI) / 180;
- 
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
- 
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
- 
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
- 
-  return R * c;
 }
