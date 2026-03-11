@@ -1,10 +1,8 @@
 "use client";
-
-import { useEffect, useMemo } from "react";
-import { MapContainer, TileLayer, Marker, Popup, CircleMarker, useMap } from "react-leaflet";
+ 
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
-
-/** Tipos */
+ 
 export type SiteNear = {
   id: number;
   sigla: string;
@@ -13,123 +11,82 @@ export type SiteNear = {
   lat: number | null;
   lon: number | null;
   distancia_m: number;
+  capacitado: string | null;
 };
-
+ 
 type Props = {
-  user: { lat: number; lng: number } | null;
+  user: { lat: number; lng: number };
   sites: SiteNear[];
   className?: string;
 };
-
-/** Ícone padrão do Leaflet (caminho quebrava no Next). Usamos CDN. */
-const defaultIcon = new L.Icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
+ 
+// 🔴 Ícone do usuário
+const userIcon = new L.Icon({
+  iconUrl: "https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png",
+  iconSize: [32, 32],
 });
-
-// (Opcional) aplica globalmente o ícone default
-L.Marker.prototype.options.icon = defaultIcon;
-
-function FitToData({ user, sites }: { user: Props["user"]; sites: SiteNear[] }) {
-  const map = useMap();
-
-  useEffect(() => {
-    const points: L.LatLngExpression[] = [];
-
-    if (user) points.push([user.lat, user.lng]);
-
-    for (const s of sites) {
-      if (typeof s.lat === "number" && typeof s.lon === "number") {
-        points.push([s.lat, s.lon]);
-      }
-    }
-
-    if (points.length === 0) return;
-
-    if (points.length === 1) {
-      map.setView(points[0] as L.LatLngExpression, 14);
-      return;
-    }
-
-    // Tipagem correta sem `any`
-    const bounds = L.latLngBounds(points as L.LatLngExpression[]);
-    map.fitBounds(bounds.pad(0.2), { animate: true, maxZoom: 16 });
-  }, [map, user, sites]);
-
-  return null;
-}
-
-function formatDistance(m: number) {
-  return m < 1000 ? `${m.toFixed(0)} m` : `${(m / 1000).toFixed(2)} km`;
-}
-
-/** Componente principal */
+ 
+// 🟢 ERB capacitada
+const capacitadoIcon = new L.Icon({
+  iconUrl: "https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png",
+  iconSize: [32, 32],
+});
+ 
+// 🔵 ERB normal
+const normalIcon = new L.Icon({
+  iconUrl: "https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png",
+  iconSize: [32, 32],
+});
+ 
 export default function ErbMap({ user, sites, className }: Props) {
-  const center = useMemo<L.LatLngExpression>(() => {
-    if (user) return [user.lat, user.lng];
-    return [-22.9068, -43.1729]; // centro do Rio
-  }, [user]);
-
   return (
-    <div className={className ?? "h-96 rounded-lg overflow-hidden"}>
-      <MapContainer center={center} zoom={13} scrollWheelZoom style={{ height: "100%", width: "100%" }}>
-        {/* Tiles do OpenStreetMap */}
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-
-        <FitToData user={user} sites={sites} />
-
-        {user && (
-          <CircleMarker
-            center={[user.lat, user.lng]}
-            radius={8}
-            pathOptions={{ color: "#2563eb", fillColor: "#3b82f6", fillOpacity: 0.9 }}
+    <MapContainer
+      center={[user.lat, user.lng]}
+      zoom={15}
+      scrollWheelZoom={true}
+      className={className}
+    >
+      <TileLayer
+        attribution="© OpenStreetMap"
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+ 
+      {/* 📍 Usuário */}
+      <Marker position={[user.lat, user.lng]} icon={userIcon}>
+        <Popup>Você está aqui</Popup>
+      </Marker>
+ 
+      {/* 📡 ERBs */}
+      {sites.map((site) => {
+        if (!site.lat || !site.lon) return null;
+ 
+        const icon =
+          site.capacitado === "sim" ? capacitadoIcon : normalIcon;
+ 
+        return (
+          <Marker
+            key={site.id}
+            position={[site.lat, site.lon]}
+            icon={icon}
           >
-            <Popup>Você está aqui</Popup>
-          </CircleMarker>
-        )}
-
-        {sites
-          .filter((s) => typeof s.lat === "number" && typeof s.lon === "number")
-          .map((s) => {
-            const mapsUrl = `https://www.google.com/maps?q=${s.lat},${s.lon}`;
-            return (
-              <Marker key={s.id} position={[s.lat!, s.lon!]} icon={defaultIcon}>
-                <Popup>
-                  <div style={{ minWidth: 180 }}>
-                    <strong>{s.sigla}</strong>
-                    {s.nome && <div style={{ fontSize: 12 }}>{s.nome}</div>}
-                    {s.endereco && <div style={{ fontSize: 12, color: "#555" }}>{s.endereco}</div>}
-                    <div style={{ marginTop: 6, fontSize: 12 }}>
-                      <span
-                        style={{ background: "#ecfdf5", color: "#065f46", padding: "2px 6px", borderRadius: 999 }}
-                      >
-                        {formatDistance(s.distancia_m)}
-                      </span>
-                    </div>
-                    <div style={{ marginTop: 8 }}>
-                      <a
-                        href={mapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ color: "#047857", textDecoration: "underline", fontSize: 13 }}
-                      >
-                        Abrir no Google Maps
-                      </a>
-                    </div>
-                  </div>
-                </Popup>
-              </Marker>
-            );
-          })}
-      </MapContainer>
-    </div>
+            <Popup>
+              <strong>{site.sigla}</strong>
+ 
+              <br />
+ 
+              {site.nome}
+ 
+              <br />
+ 
+              distância: {Math.round(site.distancia_m)} m
+ 
+              <br />
+ 
+              capacitado: {site.capacitado}
+            </Popup>
+          </Marker>
+        );
+      })}
+    </MapContainer>
   );
 }
