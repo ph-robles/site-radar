@@ -2,18 +2,21 @@
 
 import { Suspense, useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import dynamic from "next/dynamic";
+import dynamicimport from "next/dynamic";
 import SiteCard from "@/components/SiteCard";
 import type { SiteNear } from "@/components/ErbMap";
 
+// Evita SSG/Export — essa rota depende do client (search params / geolocalização)
 export const dynamic = "force-dynamic";
 
-const ErbMap = dynamic(() => import("@/components/ErbMap"), { ssr: false });
+// Leaflet/React-Leaflet só no cliente
+const ErbMap = dynamicimport(() => import("@/components/ErbMap"), { ssr: false });
 
 export default function PertoDeMimPage() {
   return (
     <section className="py-8 max-w-5xl mx-auto">
       <h2 className="text-2xl font-semibold mb-4">ERBs próximas</h2>
+      {/* Suspense é obrigatório quando usamos useSearchParams no App Router */}
       <Suspense fallback={<p className="text-sm text-gray-600">Carregando…</p>}>
         <Inner />
       </Suspense>
@@ -48,7 +51,7 @@ function Inner() {
     (async () => {
       if (!Number.isFinite(nlat) || !Number.isFinite(nlng)) {
         setLoading(false);
-        return;
+        return; // Sem coordenadas na URL → exibe botão para detectar
       }
       try {
         await fetchSites(nlat, nlng);

@@ -56,7 +56,8 @@ function FitToData({ user, sites }: { user: Props["user"]; sites: SiteNear[] }) 
       return;
     }
 
-    const bounds = L.latLngBounds(points as L.LatLngBoundsLiteral);
+    // Tipagem correta sem `any`
+    const bounds = L.latLngBounds(points as L.LatLngExpression[]);
     map.fitBounds(bounds.pad(0.2), { animate: true, maxZoom: 16 });
   }, [map, user, sites]);
 
@@ -78,7 +79,9 @@ export default function ErbMap({ user, sites, className }: Props) {
     <div className={className ?? "h-96 rounded-lg overflow-hidden"}>
       <MapContainer center={center} zoom={13} scrollWheelZoom style={{ height: "100%", width: "100%" }}>
         {/* Tiles do OpenStreetMap */}
-        https://www.openstreetmap.org/copyrightOpenStreetMap</a> contributors`}
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
 
         <FitToData user={user} sites={sites} />
