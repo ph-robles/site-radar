@@ -1,6 +1,6 @@
 "use client";
  
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet";
 import L from "leaflet";
  
 export type SiteNear = {
@@ -20,25 +20,29 @@ type Props = {
   className?: string;
 };
  
-// 🔴 Ícone do usuário
+// 🔴 usuário
 const userIcon = new L.Icon({
   iconUrl: "https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png",
   iconSize: [32, 32],
 });
  
-// 🟢 ERB capacitada
+// 🟢 capacitado
 const capacitadoIcon = new L.Icon({
   iconUrl: "https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png",
   iconSize: [32, 32],
 });
  
-// 🔵 ERB normal
+// 🔵 normal
 const normalIcon = new L.Icon({
   iconUrl: "https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png",
   iconSize: [32, 32],
 });
  
 export default function ErbMap({ user, sites, className }: Props) {
+ 
+  // ⭐ melhor ERB
+  const melhorSite = sites.length > 0 ? sites[0] : null;
+ 
   return (
     <MapContainer
       center={[user.lat, user.lng]}
@@ -51,17 +55,30 @@ export default function ErbMap({ user, sites, className }: Props) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
  
-      {/* 📍 Usuário */}
+      {/* usuário */}
       <Marker position={[user.lat, user.lng]} icon={userIcon}>
         <Popup>Você está aqui</Popup>
       </Marker>
  
-      {/* 📡 ERBs */}
+      {/* linha até melhor ERB */}
+      {melhorSite && melhorSite.lat && melhorSite.lon && (
+        <Polyline
+          positions={[
+            [user.lat, user.lng],
+            [melhorSite.lat, melhorSite.lon],
+          ]}
+          pathOptions={{ color: "green", weight: 4 }}
+        />
+      )}
+ 
+      {/* ERBs */}
       {sites.map((site) => {
         if (!site.lat || !site.lon) return null;
  
         const icon =
-          site.capacitado === "sim" ? capacitadoIcon : normalIcon;
+          site.capacitado === "sim"
+            ? capacitadoIcon
+            : normalIcon;
  
         return (
           <Marker

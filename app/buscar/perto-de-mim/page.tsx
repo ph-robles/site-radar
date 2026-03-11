@@ -2,15 +2,12 @@
  
 import { Suspense, useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import dynamicImport from "next/dynamic";
+import dynamic from "next/dynamic";
 import SiteCard from "@/components/SiteCard";
 import type { SiteNear } from "@/components/ErbMap";
  
-// Evita SSG/Export — essa rota depende do client
-export const dynamic = "force-dynamic";
- 
-// Leaflet/React-Leaflet só no cliente
-const ErbMap = dynamicImport(() => import("@/components/ErbMap"), { ssr: false });
+// Leaflet só no client
+const ErbMap = dynamic(() => import("@/components/ErbMap"), { ssr: false });
  
 export default function PertoDeMimPage() {
   return (
@@ -29,10 +26,7 @@ function Inner() {
   const params = useSearchParams();
  
   const { latStr, lngStr } = useMemo(() => {
-    return {
-      latStr: params.get("lat"),
-      lngStr: params.get("lng"),
-    };
+    return { latStr: params.get("lat"), lngStr: params.get("lng") };
   }, [params]);
  
   const nlat = latStr ? Number(latStr) : NaN;
@@ -42,14 +36,18 @@ function Inner() {
   const [sites, setSites] = useState<SiteNear[]>([]);
   const [error, setError] = useState<string | null>(null);
  
+  // ⭐ melhor ERB (primeira da lista)
+  const melhorSite = sites.length > 0 ? sites[0] : null;
+ 
   const fetchSites = useCallback(async (lat: number, lng: number) => {
-    const url = `/api/sites/near?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&radius=5000`;
+    const url = `/api/sites/near?lat=${encodeURIComponent(
+      lat
+    )}&lng=${encodeURIComponent(lng)}&radius=5000`;
  
     const res = await fetch(url, { cache: "no-store" });
  
-    if (!res.ok) {
+    if (!res.ok)
       throw new Error(`Falha ao buscar ERBs próximas. HTTP ${res.status}`);
-    }
  
     const data: { sites?: SiteNear[] } = await res.json();
  
@@ -66,7 +64,9 @@ function Inner() {
       try {
         await fetchSites(nlat, nlng);
       } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : "Erro ao buscar ERBs próximas.";
+        const msg =
+          e instanceof Error ? e.message : "Erro ao buscar ERBs próximas.";
+ 
         setError(msg);
       } finally {
         setLoading(false);
@@ -87,6 +87,7 @@ function Inner() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
+ 
         router.replace(`/buscar/perto-de-mim?lat=${latitude}&lng=${longitude}`);
       },
       (err) => {
@@ -127,8 +128,39 @@ function Inner() {
       )}
  
       {loading && <p className="text-sm text-gray-600">Carregando...</p>}
+ 
       {error && <p className="text-sm text-red-600">{error}</p>}
  
+      {/* ⭐ Melhor ERB */}
+      {melhorSite && (
+        <div className="mb-4 p-4 rounded-lg bg-green-100 border border-green-300">
+ 
+          <h3 className="font-semibold text-green-800">
+          📡 Melhor ERB para conexão
+          </h3>
+ 
+          <p className="text-sm">
+            <strong>{melhorSite.sigla}</strong>
+          </p>
+ 
+          <p className="text-sm">
+            distância: {Math.round(melhorSite.distancia_m)} metros
+          </p>
+ 
+          <p className="text-sm">
+            capacitado: {melhorSite.capacitado}
+          </p>
+ 
+          <a
+            href={`https://www.google.com/maps/dir/?api=1&destination=${melhorSite.lat},${melhorSite.lon}`}
+            target="_blank"
+            className="inline-block mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            🧭 Navegar até a ERB
+          </a>
+ 
+        </div>
+       )}
       {userPoint && (
         <div className="mb-6">
           <ErbMap
