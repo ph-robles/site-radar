@@ -1,92 +1,96 @@
 "use client";
-
-import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-
-type Site = {
-  id: number;
-  sigla: string;
-  nome: string | null;
-  endereco: string | null;
-};
-
-export default function SiglaPage() {
-  const router = useRouter();
-  const [input, setInput] = useState("");
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+ 
+import { useState } from "react";
+import SiteCard from "@/components/SiteCard";
+import type { SiteNear } from "@/components/ErbMap";
+ 
+export default function BuscarSiglaPage() {
+ 
+  const [query, setQuery] = useState("");
+  const [sites, setSites] = useState<SiteNear[]>([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Declare a função ANTES de usar no useEffect
-  const buildSuggestions = useCallback(async (raw: string) => {
-    const term = raw.trim().toUpperCase();
-    if (!term) {
-      setSuggestions([]);
-      return;
-    }
-
+ 
+  async function buscar() {
+ 
+    if (!query.trim()) return;
+ 
+    setLoading(true);
+    setError(null);
+ 
     try {
-      // Exemplo: busca back-end de siglas e cria ranking simples
-      const res = await fetch(`/api/sites/siglas?q=${encodeURIComponent(term)}`, { cache: "no-store" });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data: { siglas?: string[] } = await res.json();
-      const all = Array.isArray(data.siglas) ? data.siglas : [];
-
-      const begins = all.filter((s) => s.startsWith(term));
-      const containsOnly = all.filter((s) => !s.startsWith(term) && s.includes(term));
-      const fuzzy = all.filter((s) => !s.includes(term) && s.replace(/[^A-Z0-9]/g, "").includes(term));
-
-      setSuggestions(Array.from(new Set([...begins, ...containsOnly, ...fuzzy])).slice(0, 8));
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Erro ao sugerir siglas.";
-      setError(msg);
+ 
+      const res = await fetch(
+        `/api/sites/search?sigla=${encodeURIComponent(query)}`
+      );
+ 
+      if (!res.ok) {
+        throw new Error("Erro ao buscar sites");
+      }
+ 
+      const data = await res.json();
+ 
+      setSites(data.sites || []);
+ 
+    } catch (e: any) {
+ 
+      setError(e.message);
+ 
+    } finally {
+ 
+      setLoading(false);
+ 
     }
-  }, []);
-
-  // Debounce
-  useEffect(() => {
-    const t = setTimeout(() => {
-      void buildSuggestions(input);
-    }, 200);
-    return () => clearTimeout(t);
-  }, [input, buildSuggestions]);
-
-  async function onSubmit(e?: React.FormEvent<HTMLFormElement>) {
-    e?.preventDefault();
-    const term = input.trim().toUpperCase();
-    if (!term) return;
-    router.push(`/buscar/sigla?sigla=${encodeURIComponent(term)}`);
   }
-
+ 
   return (
-    <section className="py-8 max-w-5xl mx-auto">
-      <h2 className="text-2xl font-semibold mb-4">Buscar por Sigla</h2>
-
-      <form onSubmit={onSubmit} className="flex gap-2 mb-4">
+ 
+    <section className="max-w-4xl mx-auto py-10">
+ 
+      <h1 className="text-2xl font-semibold mb-6">
+        Buscar ERB por sigla
+      </h1>
+ 
+      <div className="flex gap-2 mb-6">
+ 
         <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Digite a sigla (ex.: ERB001)"
-          className="border rounded px-3 py-2 flex-1"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Digite a sigla (ex: DJU)"
+          className="border rounded px-3 py-2 w-full"
         />
-        <button className="rounded bg-emerald-600 text-white px-4 py-2 hover:bg-emerald-700">Buscar</button>
-      </form>
-
-      {error && <p className="text-sm text-red-600">{error}</p>}
-
-      {suggestions.length > 0 && (
-        <ul className="list-disc ml-6 text-sm space-y-1">
-          {suggestions.map((s) => (
-            <li key={s}>
-              <button
-                onClick={() => router.push(`/buscar/sigla?sigla=${encodeURIComponent(s)}`)}
-                className="text-emerald-700 underline"
-              >
-                {s}
-              </button>
-            </li>
-          ))}
-        </ul>
+ 
+        <button
+          onClick={buscar}
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Buscar
+        </button>
+ 
+      </div>
+ 
+      {loading && <p>Buscando...</p>}
+ 
+      {error && (
+        <p className="text-red-600">
+          {error}
+        </p>
       )}
+ 
+      {sites.length === 0 && !loading && (
+        <p className="text-gray-500">
+          Nenhum site encontrado
+        </p>
+      )}
+ 
+      <div className="grid gap-3">
+ 
+        {sites.map((site) => (
+          <SiteCard key={site.id} site={site} />
+        ))}
+ 
+      </div>
+ 
     </section>
   );
 }
