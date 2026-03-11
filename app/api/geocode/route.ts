@@ -1,39 +1,31 @@
-// app/api/geocode/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+type GeocodeResult = {
+  lat: number;
+  lon: number;
+  endereco?: string | null;
+};
 
-export async function GET(req: Request) {
+type GeocodeResponse = { result: GeocodeResult | null; error?: string };
+
+export async function GET(req: NextRequest): Promise<NextResponse<GeocodeResponse>> {
   try {
     const { searchParams } = new URL(req.url);
-    const q = (searchParams.get("q") || "").trim();
-    if (!q) return NextResponse.json({});
+    const q = searchParams.get("q");
+    if (!q) {
+      return NextResponse.json({ result: null, error: "Parâmetro 'q' é obrigatório." }, { status: 400 });
+    }
 
-    // Nominatim (OSM): gratuito, sem chave. Use um User-Agent identificável.
-    const url = new URL("https://nominatim.openstreetmap.org/search");
-    url.searchParams.set("format", "jsonv2");
-    url.searchParams.set("q", q);
-    url.searchParams.set("limit", "1");
-    url.searchParams.set("addressdetails", "1");
+    // TODO: Chamar seu serviço de geocoding real
+    const result: GeocodeResult = {
+      lat: -22.9068,
+      lon: -43.1729,
+      endereco: q,
+    };
 
-    const res = await fetch(url.toString(), {
-      headers: { "User-Agent": "SiteRadar/1.0 (ph.robles33@gmail.com)" }, // <— troque para seu e-mail
-      // Evita cache agressivo no edge/CDN:
-      next: { revalidate: 0 },
-    });
-
-    if (!res.ok) throw new Error("Falha no geocoding.");
-    const arr = await res.json();
-    if (!Array.isArray(arr) || arr.length === 0) return NextResponse.json({});
-
-    const item = arr[0];
-    const lat = parseFloat(item.lat);
-    const lng = parseFloat(item.lon);
-    const label = item.display_name as string;
-
-    return NextResponse.json({ lat, lng, label }, { headers: { "Cache-Control": "no-store" } });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message ?? "Erro no geocoding." }, { status: 500 });
+    return NextResponse.json({ result }, { status: 200 });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : "Erro interno";
+    return NextResponse.json({ result: null, error: msg }, { status: 500 });
   }
 }

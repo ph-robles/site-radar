@@ -1,33 +1,36 @@
-// app/api/sites/near/route.ts
-import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
+import { NextRequest, NextResponse } from "next/server";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+type SiteNear = {
+  id: number;
+  sigla: string;
+  nome: string | null;
+  endereco: string | null;
+  lat: number | null;
+  lon: number | null;
+  distancia_m: number;
+};
 
-export async function GET(req: Request) {
+type SitesNearResponse = { sites: SiteNear[]; error?: string };
+
+export async function GET(req: NextRequest): Promise<NextResponse<SitesNearResponse>> {
   try {
     const { searchParams } = new URL(req.url);
-    const lat = parseFloat(searchParams.get("lat") || "");
-    const lng = parseFloat(searchParams.get("lng") || "");
-    const radius = parseInt(searchParams.get("radius") || "5000", 10);
-    const limit = parseInt(searchParams.get("limit") || "20", 10);
+    const lat = Number(searchParams.get("lat"));
+    const lng = Number(searchParams.get("lng"));
+    const radius = Number(searchParams.get("radius") ?? 5000);
 
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-      return NextResponse.json({ error: "Parâmetros lat/lng inválidos." }, { status: 400 });
+      return NextResponse.json({ sites: [], error: "lat/lng inválidos" }, { status: 400 });
     }
 
-    const { data, error } = await supabase.rpc("sites_nearby", {
-      p_lat: lat,
-      p_lon: lng,
-      p_radius_m: radius,
-      p_limit: limit,
-    });
+    // TODO: Query real (ordenado por distância)
+    const sites: SiteNear[] = [
+      { id: 1, sigla: "ERB001", nome: "Torre Centro", endereco: "Rua X, 123", lat, lon: lng, distancia_m: 123 },
+    ];
 
-    if (error) throw error;
-
-    return NextResponse.json({ sites: data ?? [] }, { headers: { "Cache-Control": "no-store" } });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message ?? "Erro ao buscar ERBs próximas." }, { status: 500 });
+    return NextResponse.json({ sites }, { status: 200 });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : "Erro interno";
+    return NextResponse.json({ sites: [], error: msg }, { status: 500 });
   }
 }

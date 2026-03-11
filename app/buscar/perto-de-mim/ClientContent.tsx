@@ -1,27 +1,15 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import SiteCard from "@/components/SiteCard";
 import type { SiteNear } from "@/components/ErbMap";
 
-export const dynamic = "force-dynamic";
-
+// Importa o mapa só no cliente (react-leaflet/leaflet não suportam SSR)
 const ErbMap = dynamic(() => import("@/components/ErbMap"), { ssr: false });
 
-export default function PertoDeMimPage() {
-  return (
-    <section className="py-8 max-w-5xl mx-auto">
-      <h2 className="text-2xl font-semibold mb-4">ERBs próximas</h2>
-      <Suspense fallback={<p className="text-sm text-gray-600">Carregando…</p>}>
-        <Inner />
-      </Suspense>
-    </section>
-  );
-}
-
-function Inner() {
+export default function ClientContent() {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -40,7 +28,7 @@ function Inner() {
     const url = `/api/sites/near?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&radius=5000`;
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) throw new Error(`Falha ao buscar ERBs próximas. HTTP ${res.status}`);
-    const data: { sites?: SiteNear[] } = await res.json();
+    const data = await res.json();
     setSites(Array.isArray(data.sites) ? data.sites : []);
   }, []);
 
@@ -48,13 +36,12 @@ function Inner() {
     (async () => {
       if (!Number.isFinite(nlat) || !Number.isFinite(nlng)) {
         setLoading(false);
-        return;
+        return; // Sem coordenadas na URL → exibe o botão de detectar
       }
       try {
         await fetchSites(nlat, nlng);
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : "Erro ao buscar ERBs próximas.";
-        setError(msg);
+      } catch (e: any) {
+        setError(e?.message ?? "Erro ao buscar ERBs próximas.");
       } finally {
         setLoading(false);
       }
@@ -89,6 +76,7 @@ function Inner() {
 
   return (
     <>
+      {/* Se não tem coords na URL, oferecemos o botão de detectar */}
       {!userPoint && !loading && (
         <div className="mb-6 space-y-3">
           <p className="text-sm text-gray-700">
@@ -106,12 +94,14 @@ function Inner() {
       {loading && <p className="text-sm text-gray-600">Carregando...</p>}
       {error && <p className="text-sm text-red-600">{error}</p>}
 
+      {/* Mapa */}
       {userPoint && (
         <div className="mb-6">
           <ErbMap user={userPoint} sites={sites} className="h-80 rounded-lg overflow-hidden shadow" />
         </div>
       )}
 
+      {/* Lista de resultados */}
       {!loading && !error && sites.length === 0 && userPoint && (
         <p className="text-sm text-gray-600">Nenhuma ERB encontrada neste raio.</p>
       )}
