@@ -20,19 +20,16 @@ type Props = {
   className?: string;
 };
  
-// 🔴 usuário
 const userIcon = new L.Icon({
   iconUrl: "https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png",
   iconSize: [32, 32],
 });
  
-// 🟢 capacitado
 const capacitadoIcon = new L.Icon({
   iconUrl: "https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png",
   iconSize: [32, 32],
 });
  
-// 🔵 normal
 const normalIcon = new L.Icon({
   iconUrl: "https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png",
   iconSize: [32, 32],
@@ -40,7 +37,6 @@ const normalIcon = new L.Icon({
  
 export default function ErbMap({ user, sites, className }: Props) {
  
-  // ⭐ melhor ERB
   const melhorSite = sites.length > 0 ? sites[0] : null;
  
   return (
@@ -55,12 +51,10 @@ export default function ErbMap({ user, sites, className }: Props) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
  
-      {/* usuário */}
       <Marker position={[user.lat, user.lng]} icon={userIcon}>
         <Popup>Você está aqui</Popup>
       </Marker>
  
-      {/* linha até melhor ERB */}
       {melhorSite && melhorSite.lat && melhorSite.lon && (
         <Polyline
           positions={[
@@ -71,14 +65,15 @@ export default function ErbMap({ user, sites, className }: Props) {
         />
       )}
  
-      {/* ERBs */}
       {sites.map((site) => {
         if (!site.lat || !site.lon) return null;
  
-        const icon =
-          site.capacitado === "sim"
-            ? capacitadoIcon
-            : normalIcon;
+        const isCapacitado =
+          site.capacitado?.toLowerCase() === "sim";
+ 
+        const icon = isCapacitado
+          ? capacitadoIcon
+          : normalIcon;
  
         return (
           <Marker
