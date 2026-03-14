@@ -1,10 +1,10 @@
 "use client";
  
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import { getSites } from "@/services/sites";
-import { title } from "process";
+import SearchBar from "./SearchBar";
  
 type Site = {
   id: number;
@@ -15,9 +15,23 @@ type Site = {
   lon: number;
 };
  
+function FlyToSite({ site }: { site: Site | null }) {
+ 
+  const map = useMap();
+ 
+  useEffect(() => {
+    if (site) {
+      map.flyTo([site.lat, site.lon], 15);
+    }
+  }, [site]);
+ 
+  return null;
+}
+ 
 export default function MapView() {
  
   const [sites, setSites] = useState<Site[]>([]);
+  const [selectedSite, setSelectedSite] = useState<Site | null>(null);
  
   useEffect(() => {
  
@@ -32,43 +46,51 @@ export default function MapView() {
  
   return (
  
-    <MapContainer
-      center={[-22.9068, -43.1729]}
-      zoom={11}
-      style={{ height: "600px", width: "100%" }}
-    >
+    <div>
  
-      <TileLayer
-        attribution='© OpenStreetMap'
-        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+      <SearchBar onResult={setSelectedSite} />
  
-      {sites.map((site) => (
+      <MapContainer
+        center={[-22.9068, -43.1729]}
+        zoom={11}
+        style={{ height: "600px", width: "100%" }}
+      >
  
-        <Marker
-          key={site.id}
-          position={[site.lat, site.lon]}
-        >
+        <TileLayer
+          attribution="© OpenStreetMap"
+          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
  
-          <Popup>
+        <FlyToSite site={selectedSite} />
  
-            <b>{site.sigla}</b>
+        {sites.map((site) => (
  
-            <br />
+          <Marker
+            key={site.id}
+            position={[site.lat, site.lon]}
+          >
  
-            {site.nome}
+            <Popup>
  
-            <br />
+              <b>{site.sigla}</b>
  
-            Operadora: {site.detentora}
+              <br />
  
-          </Popup>
+              {site.nome}
  
-        </Marker>
+              <br />
  
-      ))}
+              Operadora: {site.detentora}
  
-    </MapContainer>
+            </Popup>
+ 
+          </Marker>
+ 
+        ))}
+ 
+      </MapContainer>
+ 
+    </div>
  
   );
 }
