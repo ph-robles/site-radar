@@ -1,6 +1,6 @@
 "use client";
  
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-leaflet";
 import { useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import { getSites } from "@/services/sites";
@@ -81,6 +81,20 @@ export default function MapView() {
         />
  
         <FlyToSite site={selectedSite} />
+
+        {selectedSite && (
+ 
+          <Circle
+            center={[selectedSite.lat, selectedSite.lon]}
+            radius={2000}
+            pathOptions={{
+              color: "red",
+              fillColor: "red",
+              fillOpacity: 0.1
+            }}
+          />
+        
+        )}
  
         {sites.map((site) => {
  
