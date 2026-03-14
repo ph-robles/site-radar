@@ -1,46 +1,47 @@
-import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
  
-export async function GET(req: NextRequest) {
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
  
-  try {
+function normalize(text: string) {
+  return text
+    .toUpperCase()
+    .replace(/\s+/g, "")
+    .replace(/^RJ/, "");
+}
  
-    const { searchParams } = new URL(req.url);
+export async function GET(req: Request) {
  
-    const sigla = searchParams.get("sigla");
+  const { searchParams } = new URL(req.url);
  
-    if (!sigla) {
-      return NextResponse.json(
-        { sites: [] },
-        { status: 200 }
-      );
-    }
+  const siglaRaw = searchParams.get("sigla");
  
-    const termo = sigla.toUpperCase();
+  if (!siglaRaw) {
+    return NextResponse.json({ sites: [] });
+  }
  
-    const { data, error } = await supabase
-      .from("sites")
-      .select("*")
-      .ilike("sigla", `%${termo}%`)
-      .limit(20);
+  const sigla = normalize(siglaRaw);
  
-    if (error) {
-      throw error;
-    }
+  const { data, error } = await supabase
+    .from("sites")
+    .select("id, sigla, nome, detentora, endereco, capacitado")
+    .or(`sigla.ilike.%${sigla}%,nome.ilike.%${sigla}%`)
+    .limit(20);
  
-    return NextResponse.json({
-      sites: data ?? []
-    });
- 
-  } catch (e: any) {
+  if (error) {
  
     return NextResponse.json(
-      {
-        sites: [],
-        error: e.message
-      },
+      { error: error.message },
       { status: 500 }
     );
  
   }
+ 
+  return NextResponse.json({
+    sites: data ?? []
+  });
+ 
 }

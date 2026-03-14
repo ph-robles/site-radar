@@ -1,47 +1,68 @@
 "use client";
  
-import { useState } from "react";
-import SiteCard from "@/components/SiteCard";
-import type { SiteNear } from "@/components/ErbMap";
+import { useState, useEffect } from "react";
+ 
+type Site = {
+  id: number;
+  sigla: string;
+  nome: string;
+  detentora: string;
+  endereco: string;
+  capacitado: boolean | string;
+};
  
 export default function BuscarSiglaPage() {
  
   const [query, setQuery] = useState("");
-  const [sites, setSites] = useState<SiteNear[]>([]);
+  const [sites, setSites] = useState<Site[]>([]);
+  const [suggestions, setSuggestions] = useState<Site[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
  
-  async function buscar() {
+  function normalize(text: string) {
+    return text
+      .toUpperCase()
+      .replace(/\s+/g, "")
+      .replace(/^RJ/, "");
+  }
  
-    if (!query.trim()) return;
+  async function buscar(valor: string) {
+ 
+    if (!valor) return;
  
     setLoading(true);
-    setError(null);
  
-    try {
+    const res = await fetch(
+      `/api/sites/search?sigla=${encodeURIComponent(valor)}`
+    );
+ 
+    const data = await res.json();
+ 
+    setSites(data.sites || []);
+    setLoading(false);
+  }
+ 
+  useEffect(() => {
+ 
+    const delay = setTimeout(async () => {
+ 
+      if (query.length < 2) {
+        setSuggestions([]);
+        return;
+      }
  
       const res = await fetch(
-        `/api/sites/search?sigla=${encodeURIComponent(query)}`
+        `/api/sites/search?sigla=${encodeURIComponent(normalize(query))}`
       );
- 
-      if (!res.ok) {
-        throw new Error("Erro ao buscar sites");
-      }
  
       const data = await res.json();
  
-      setSites(data.sites || []);
+      setSuggestions(data.sites.slice(0, 6));
  
-    } catch (e: any) {
+    }, 250);
  
-      setError(e.message);
+    return () => clearTimeout(delay);
  
-    } finally {
- 
-      setLoading(false);
- 
-    }
-  }
+  }, [query]);
  
   return (
  
@@ -51,42 +72,87 @@ export default function BuscarSiglaPage() {
         Buscar ERB por sigla
       </h1>
  
-      <div className="flex gap-2 mb-6">
+      <div className="relative flex gap-2 mb-6">
  
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Digite a sigla (ex: DJU)"
+          placeholder="Digite sigla ou nome"
           className="border rounded px-3 py-2 w-full"
         />
  
         <button
-          onClick={buscar}
+          onClick={() => buscar(normalize(query))}
           className="bg-blue-600 text-white px-4 py-2 rounded"
         >
           Buscar
         </button>
  
+        {suggestions.length > 0 && (
+ 
+          <div className="absolute top-12 left-0 right-0 bg-white border rounded shadow">
+ 
+            {suggestions.map((site) => (
+ 
+              <div
+                key={site.id}
+                onClick={() => {
+                  setQuery(site.sigla);
+                  setSuggestions([]);
+                  buscar(site.sigla);
+                }}
+                className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex gap-2"
+              >
+ 
+                📡 <strong>{site.sigla}</strong>
+ 
+                <span className="text-xs text-gray-500">
+                  {site.nome}
+                </span>
+ 
+              </div>
+ 
+            ))}
+ 
+          </div>
+ 
+        )}
+ 
       </div>
  
       {loading && <p>Buscando...</p>}
  
-      {error && (
-        <p className="text-red-600">
-          {error}
-        </p>
-      )}
- 
-      {sites.length === 0 && !loading && (
-        <p className="text-gray-500">
-          Nenhum site encontrado
-        </p>
-      )}
- 
-      <div className="grid gap-3">
+      <div className="grid gap-4">
  
         {sites.map((site) => (
-          <SiteCard key={site.id} site={site} />
+ 
+          <div
+            key={site.id}
+            className="border rounded-lg p-4 shadow-sm bg-white"
+          >
+ 
+            <h3 className="text-lg font-semibold">
+              📡 {site.sigla}
+            </h3>
+ 
+            <p>🏢 {site.nome}</p>
+ 
+            <p>📶 {site.detentora}</p>
+ 
+            <p>📍 {site.endereco}</p>
+ 
+            {site.capacitado === true || site.capacitado === "SIM" ? (
+              <span className="text-green-700">
+                ⚡ Capacitado
+              </span>
+            ) : (
+              <span className="text-red-700">
+                ❌ Não capacitado
+              </span>
+            )}
+ 
+          </div>
+ 
         ))}
  
       </div>
@@ -94,3 +160,4 @@ export default function BuscarSiglaPage() {
     </section>
   );
 }
+ 
