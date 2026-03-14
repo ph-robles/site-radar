@@ -7,6 +7,17 @@ import { getSites } from "@/services/sites";
 import SearchBar from "./SearchBar";
 import L from "leaflet";
  
+type Site = {
+  id: number;
+  sigla: string;
+  nome: string;
+  detentora: string;
+  lat: number;
+  lon: number;
+};
+ 
+/* ---------------------- ICONES ---------------------- */
+ 
 const defaultIcon = new L.Icon({
   iconUrl:
     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -24,17 +35,8 @@ const redIcon = new L.Icon({
   iconSize: [25, 41],
   iconAnchor: [12, 41],
 });
-
-
  
-type Site = {
-  id: number;
-  sigla: string;
-  nome: string;
-  detentora: string;
-  lat: number;
-  lon: number;
-};
+/* ---------------------- FLY TO SITE ---------------------- */
  
 function FlyToSite({ site }: { site: Site | null }) {
  
@@ -49,6 +51,8 @@ function FlyToSite({ site }: { site: Site | null }) {
   return null;
 }
  
+/* ---------------------- MAP VIEW ---------------------- */
+ 
 export default function MapView() {
  
   const [sites, setSites] = useState<Site[]>([]);
@@ -57,8 +61,13 @@ export default function MapView() {
   useEffect(() => {
  
     async function loadSites() {
+ 
       const data = await getSites();
+ 
+      console.log("Sites carregados:", data?.length);
+ 
       setSites(data);
+ 
     }
  
     loadSites();
@@ -83,8 +92,10 @@ export default function MapView() {
         />
  
         <FlyToSite site={selectedSite} />
-
-        {selectedSite ? (
+ 
+        {/* CÍRCULO DE 2KM */}
+ 
+        {selectedSite && (
  
           <Circle
             center={[Number(selectedSite.lat), Number(selectedSite.lon)]}
@@ -95,41 +106,38 @@ export default function MapView() {
               fillOpacity: 0.1,
             }}
           />
-        
-        ) : null}
  
-        {sites.map((site) => {
+        )}
  
-  const isSelected = selectedSite?.id === site.id;
+        {/* MARCADORES */}
  
-  return (
+        {sites
+          .filter((site) => site.lat && site.lon)
+          .map((site) => (
  
-                <Marker
-                  key={site.id}
-                  position={[Number(site.lat), Number(site.lon)]}
-                  icon={selectedSite?.id === site.id ? redIcon : defaultIcon}
-                 >
-      
-            <Popup>
-      
-              <b>{site.sigla}</b>
-      
-              <br />
-      
-              {site.nome}
-      
-              <br />
-      
-              Operadora: {site.detentora}
-      
-            </Popup>
-      
-          </Marker>
-      
-        );
-      
-      })}
+            <Marker
+              key={site.id}
+              position={[Number(site.lat), Number(site.lon)]}
+              icon={selectedSite?.id === site.id ? redIcon : defaultIcon}
+            >
  
+              <Popup>
+ 
+                <b>{site.sigla}</b>
+ 
+                <br />
+ 
+                {site.nome}
+ 
+                <br />
+ 
+                Operadora: {site.detentora}
+ 
+              </Popup>
+ 
+            </Marker>
+ 
+          ))}
  
       </MapContainer>
  
@@ -137,5 +145,4 @@ export default function MapView() {
  
   );
 }
-
  

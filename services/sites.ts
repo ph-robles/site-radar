@@ -13,7 +13,7 @@ export async function getSites(): Promise<Site[]> {
  
   const { data, error } = await supabase
     .from("sites")
-    .select("id, sigla, nome, detentora, lat, lon");
+    .select("*");
  
   if (error) {
     console.error("Erro ao buscar sites:", error);
