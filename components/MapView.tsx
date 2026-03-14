@@ -35,7 +35,7 @@ function FlyToSite({ site }: { site: Site | null }) {
     if (site) {
       map.flyTo([site.lat, site.lon], 15);
     }
-  }, [site]);
+  }, [site, map]);
  
   return null;
 }

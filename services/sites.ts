@@ -1,6 +1,16 @@
 import { supabase } from "@/lib/supabase";
  
-export async function getSites() {
+export type Site = {
+  id: number;
+  sigla: string;
+  nome: string;
+  detentora: string;
+  lat: number;
+  lon: number;
+};
+ 
+export async function getSites(): Promise<Site[]> {
+ 
   const { data, error } = await supabase
     .from("sites")
     .select("id, sigla, nome, detentora, lat, lon");
@@ -13,18 +23,24 @@ export async function getSites() {
   return data ?? [];
 }
  
-export async function searchSiteBySigla(sigla: string) {
+export async function searchSites(sigla: string): Promise<Site[]> {
+ 
+  const cleaned = sigla
+    .toUpperCase()
+    .replace("RJ", "")
+    .replace(/\s/g, "");
  
   const { data, error } = await supabase
     .from("sites")
     .select("id, sigla, nome, detentora, lat, lon")
-    .ilike("sigla", `%${sigla}%`)
-    .limit(1);
+    .ilike("sigla", `%${cleaned}%`)
+    .limit(5);
  
   if (error) {
-    console.error("Erro ao buscar site:", error);
-    return null;
+    console.error("Erro ao buscar sites:", error);
+    return [];
   }
  
-  return data?.[0] ?? null;
+  return data ?? [];
 }
+ 
