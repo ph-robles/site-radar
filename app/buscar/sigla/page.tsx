@@ -71,30 +71,30 @@ export default function BuscarSiglaPage() {
     <section className="max-w-4xl mx-auto py-10">
  
       <h1 className="text-2xl font-semibold mb-6">
-        Buscar ERB por sigla
+        📡 Buscar ERB por sigla
       </h1>
  
       {/* BUSCA */}
  
-      <div className="relative flex gap-2 mb-6">
+      <div className="relative flex gap-2 mb-8">
  
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Digite sigla ou nome"
+          placeholder="Digite sigla ou nome da ERB"
           className="border rounded px-3 py-2 w-full"
         />
  
         <button
           onClick={() => buscar(normalize(query))}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           Buscar
         </button>
  
         {suggestions.length > 0 && (
  
-          <div className="absolute top-12 left-0 right-0 bg-white border rounded shadow">
+          <div className="absolute top-12 left-0 right-0 bg-white border rounded shadow z-10">
  
             {suggestions.map((site) => (
  
@@ -124,58 +124,72 @@ export default function BuscarSiglaPage() {
  
       </div>
  
-      {loading && <p>Buscando...</p>}
+      {loading && <p>🔎 Buscando...</p>}
  
       {/* RESULTADOS */}
  
-      <div className="grid gap-4">
+      <div className="grid gap-5">
  
         {sites.map((site) => (
  
           <div
             key={site.id}
-            className="border rounded-lg p-4 shadow-sm bg-white"
+            className="border rounded-lg p-5 shadow-sm bg-white hover:shadow-md transition"
           >
  
-            <h3 className="text-lg font-semibold">
+            <h3 className="text-lg font-semibold mb-2">
               📡 {site.sigla}
             </h3>
  
-            <p>🏢 {site.nome}</p>
+            <p className="text-sm text-gray-700">
+              🏢 <strong>Nome:</strong> {site.nome || "Não informado"}
+            </p>
  
-            <p>📶 {site.detentora}</p>
+            <p className="text-sm text-gray-700">
+              📶 <strong>Operadora:</strong> {site.detentora || "Não informado"}
+            </p>
  
-            <p>📍 {site.endereco}</p>
+            <p className="text-sm text-gray-700">
+              📍 <strong>Endereço:</strong> {site.endereco || "Não informado"}
+            </p>
  
-            {site.capacitado === true || site.capacitado === "SIM" ? (
-              <span className="text-green-700">
-                ⚡ Capacitado
-              </span>
-            ) : (
-              <span className="text-red-700">
-                ❌ Não capacitado
-              </span>
-            )}
+            <div className="mt-2">
+ 
+              {site.capacitado === true || site.capacitado === "SIM" ? (
+ 
+                <span className="text-green-700 font-medium">
+                  ⚡ Capacitado
+                </span>
+ 
+              ) : (
+ 
+                <span className="text-red-700 font-medium">
+                  ❌ Não capacitado
+                </span>
+ 
+              )}
+ 
+            </div>
  
             {/* BOTÕES */}
  
-            <div className="flex gap-3 mt-4">
+            <div className="flex gap-3 mt-4 flex-wrap">
  
-              {/* VER NO MAPA */}
+              {/* VER NO GOOGLE MAPS */}
  
               <button
                 onClick={() =>
                   window.open(
-                    `/?lat=${site.lat}&lon=${site.lon}&sigla=${site.sigla}`,
+                    `https://www.google.com/maps?q=${site.lat},${site.lon}`,
                     "_blank"
                   )
                 }
-                className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
               >
                 🗺 Ver no mapa
               </button>
  
-              {/* ROTA */}
+              {/* ROTA ATÉ A ERB */}
  
               <button
                 onClick={() =>
@@ -184,7 +198,7 @@ export default function BuscarSiglaPage() {
                     "_blank"
                   )
                 }
-                className="bg-green-600 text-white px-3 py-1 rounded text-sm"
+                className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
               >
                 🚗 Rota até a ERB
               </button>
