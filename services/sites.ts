@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "../lib/supabase";
  
 export async function getSites() {
  
@@ -13,5 +13,5 @@ export async function getSites() {
     return [];
   }
  
-  return data;
+  return data ?? [];
 }
