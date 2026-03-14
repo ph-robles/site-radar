@@ -10,6 +10,7 @@ import {
 } from "react-leaflet";
  
 import { useEffect, useState } from "react";
+ 
 import "leaflet/dist/leaflet.css";
  
 import L from "leaflet";
@@ -28,7 +29,7 @@ type Site = {
   lon: number;
 };
  
-/* ---------- ICONES ---------- */
+/* ---------------- ICONES ---------------- */
  
 const defaultIcon = new L.Icon({
   iconUrl:
@@ -48,7 +49,7 @@ const redIcon = new L.Icon({
   iconAnchor: [12, 41],
 });
  
-/* ---------- DISTANCIA ---------- */
+/* ---------------- DISTANCIA ENTRE SITES ---------------- */
  
 function calcDistance(
   lat1: number,
@@ -74,28 +75,35 @@ function calcDistance(
   return R * c;
 }
  
-/* ---------- FLY TO ---------- */
+/* ---------------- ZOOM NO SITE ---------------- */
  
 function FlyToSite({ site }: { site: Site | null }) {
  
   const map = useMap();
  
   useEffect(() => {
+ 
     if (site) {
-      map.flyTo([Number(site.lat), Number(site.lon)], 15);
+      map.flyTo(
+        [Number(site.lat), Number(site.lon)],
+        15
+      );
     }
+ 
   }, [site, map]);
  
   return null;
 }
  
-/* ---------- MAP ---------- */
+/* ---------------- MAPA ---------------- */
  
 export default function MapView() {
  
   const [sites, setSites] = useState<Site[]>([]);
   const [selectedSite, setSelectedSite] = useState<Site | null>(null);
   const [nearSites, setNearSites] = useState<any[]>([]);
+ 
+  /* ----------- CARREGAR SITES ----------- */
  
   useEffect(() => {
  
@@ -113,7 +121,7 @@ export default function MapView() {
  
   }, []);
  
-  /* ---------- CALCULAR SITES PROXIMOS ---------- */
+  /* ----------- CALCULAR SITES PROXIMOS ----------- */
  
   useEffect(() => {
  
@@ -147,6 +155,8 @@ export default function MapView() {
  
     <div>
  
+      {/* BUSCA */}
+ 
       <SearchBar onResult={setSelectedSite} />
  
       {/* LISTA DE SITES PROXIMOS */}
@@ -156,15 +166,18 @@ export default function MapView() {
         <div
           style={{
             background: "#fff",
-            padding: 10,
+            padding: 12,
             marginBottom: 10,
-            borderRadius: 8
+            borderRadius: 8,
+            border: "1px solid #ddd"
           }}
         >
  
           <b>Sites dentro de 2 km</b>
  
-          {nearSites.length === 0 && <p>Nenhum site próximo</p>}
+          {nearSites.length === 0 && (
+            <p>Nenhum site próximo</p>
+          )}
  
           {nearSites.map((s) => (
  
@@ -180,10 +193,15 @@ export default function MapView() {
  
       )}
  
+      {/* MAPA */}
+ 
       <MapContainer
         center={[-22.9068, -43.1729]}
         zoom={11}
-        style={{ height: "600px", width: "100%" }}
+        style={{
+          height: "600px",
+          width: "100%"
+        }}
       >
  
         <TileLayer
@@ -193,7 +211,7 @@ export default function MapView() {
  
         <FlyToSite site={selectedSite} />
  
-        {/* CIRCULO */}
+        {/* CIRCULO DE COBERTURA */}
  
         {selectedSite && (
  
@@ -212,7 +230,7 @@ export default function MapView() {
  
         )}
  
-        {/* CLUSTER */}
+        {/* CLUSTER DE SITES */}
  
         <MarkerClusterGroup>
  
@@ -235,15 +253,29 @@ export default function MapView() {
  
                 <Popup>
  
-                  <b>{site.sigla}</b>
+                  <div style={{ minWidth: 150 }}>
  
-                  <br />
+                    <b>Site:</b> {site.sigla ?? "N/A"}
  
-                  {site.nome}
+                    <br />
  
-                  <br />
+                    <b>Nome:</b> {site.nome ?? "N/A"}
  
-                  Operadora: {site.detentora}
+                    <br />
+ 
+                    <b>Operadora:</b> {site.detentora ?? "N/A"}
+ 
+                    <br />
+ 
+                    <b>Lat:</b>{" "}
+                    {Number(site.lat).toFixed(5)}
+ 
+                    <br />
+ 
+                    <b>Lon:</b>{" "}
+                    {Number(site.lon).toFixed(5)}
+ 
+                  </div>
  
                 </Popup>
  
