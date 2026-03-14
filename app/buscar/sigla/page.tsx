@@ -9,8 +9,8 @@ type Site = {
   detentora: string;
   endereco: string;
   capacitado: boolean | string;
-  lat: number;
-  lon: number;
+  lat: number | null;
+  lon: number | null;
 };
  
 export default function BuscarSiglaPage() {
@@ -33,13 +33,22 @@ export default function BuscarSiglaPage() {
  
     setLoading(true);
  
-    const res = await fetch(
-      `/api/sites/search?sigla=${encodeURIComponent(valor)}`
-    );
+    try {
  
-    const data = await res.json();
+      const res = await fetch(
+        `/api/sites/search?sigla=${encodeURIComponent(valor)}`
+      );
  
-    setSites(data.sites || []);
+      const data = await res.json();
+ 
+      setSites(data.sites || []);
+ 
+    } catch {
+ 
+      alert("Erro ao buscar sites");
+ 
+    }
+ 
     setLoading(false);
   }
  
@@ -52,13 +61,21 @@ export default function BuscarSiglaPage() {
         return;
       }
  
-      const res = await fetch(
-        `/api/sites/search?sigla=${encodeURIComponent(normalize(query))}`
-      );
+      try {
  
-      const data = await res.json();
+        const res = await fetch(
+          `/api/sites/search?sigla=${encodeURIComponent(normalize(query))}`
+        );
  
-      setSuggestions(data.sites.slice(0, 6));
+        const data = await res.json();
+ 
+        setSuggestions(data.sites.slice(0, 6));
+ 
+      } catch {
+ 
+        setSuggestions([]);
+ 
+      }
  
     }, 250);
  
@@ -91,6 +108,8 @@ export default function BuscarSiglaPage() {
         >
           Buscar
         </button>
+ 
+        {/* AUTOCOMPLETE */}
  
         {suggestions.length > 0 && (
  
@@ -178,26 +197,40 @@ export default function BuscarSiglaPage() {
               {/* VER NO GOOGLE MAPS */}
  
               <button
-                onClick={() =>
-                  window.open(
-                    `https://www.google.com/maps?q=${site.lat},${site.lon}`,
-                    "_blank"
-                  )
-                }
+                onClick={() => {
+ 
+                  if (!site.lat || !site.lon) {
+                    alert("Coordenadas não disponíveis para esta ERB");
+                    return;
+                  }
+ 
+                  const url =
+                    `https://www.google.com/maps/search/?api=1&query=${site.lat},${site.lon}`;
+ 
+                  window.open(url, "_blank");
+ 
+                }}
                 className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
               >
-                🗺 Ver no mapa
+                🗺 Ver no Google Maps
               </button>
  
-              {/* ROTA ATÉ A ERB */}
+              {/* ROTA */}
  
               <button
-                onClick={() =>
-                  window.open(
-                    `https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}`,
-                    "_blank"
-                  )
-                }
+                onClick={() => {
+ 
+                  if (!site.lat || !site.lon) {
+                    alert("Coordenadas não disponíveis");
+                    return;
+                  }
+ 
+                  const url =
+                    `https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}`;
+ 
+                  window.open(url, "_blank");
+ 
+                }}
                 className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
               >
                 🚗 Rota até a ERB
@@ -212,7 +245,6 @@ export default function BuscarSiglaPage() {
       </div>
  
     </section>
- 
   );
 }
  
