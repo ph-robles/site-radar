@@ -9,6 +9,8 @@ type Site = {
   detentora: string;
   endereco: string;
   capacitado: boolean | string;
+  lat: number;
+  lon: number;
 };
  
 export default function BuscarSiglaPage() {
@@ -72,6 +74,8 @@ export default function BuscarSiglaPage() {
         Buscar ERB por sigla
       </h1>
  
+      {/* BUSCA */}
+ 
       <div className="relative flex gap-2 mb-6">
  
         <input
@@ -122,6 +126,8 @@ export default function BuscarSiglaPage() {
  
       {loading && <p>Buscando...</p>}
  
+      {/* RESULTADOS */}
+ 
       <div className="grid gap-4">
  
         {sites.map((site) => (
@@ -151,6 +157,40 @@ export default function BuscarSiglaPage() {
               </span>
             )}
  
+            {/* BOTÕES */}
+ 
+            <div className="flex gap-3 mt-4">
+ 
+              {/* VER NO MAPA */}
+ 
+              <button
+                onClick={() =>
+                  window.open(
+                    `/?lat=${site.lat}&lon=${site.lon}&sigla=${site.sigla}`,
+                    "_blank"
+                  )
+                }
+                className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+              >
+                🗺 Ver no mapa
+              </button>
+ 
+              {/* ROTA */}
+ 
+              <button
+                onClick={() =>
+                  window.open(
+                    `https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}`,
+                    "_blank"
+                  )
+                }
+                className="bg-green-600 text-white px-3 py-1 rounded text-sm"
+              >
+                🚗 Rota até a ERB
+              </button>
+ 
+            </div>
+ 
           </div>
  
         ))}
@@ -158,6 +198,7 @@ export default function BuscarSiglaPage() {
       </div>
  
     </section>
+ 
   );
 }
  

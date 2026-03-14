@@ -27,7 +27,7 @@ export async function GET(req: Request) {
  
   const { data, error } = await supabase
     .from("sites")
-    .select("id, sigla, nome, detentora, endereco, capacitado")
+    .select("id, sigla, nome, detentora, endereco, capacitado, lat, lon")
     .or(`sigla.ilike.%${sigla}%,nome.ilike.%${sigla}%`)
     .limit(20);
  
