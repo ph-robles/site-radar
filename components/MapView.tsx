@@ -17,6 +17,13 @@ L.Icon.Default.mergeOptions({
   shadowUrl:
     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
+
+const redIcon = new L.Icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
  
 type Site = {
   id: number;
@@ -75,30 +82,38 @@ export default function MapView() {
  
         <FlyToSite site={selectedSite} />
  
-        {sites.map((site) => (
+        {sites.map((site) => {
+ 
+  const isSelected = selectedSite?.id === site.id;
+ 
+  return (
  
           <Marker
             key={site.id}
             position={[site.lat, site.lon]}
+            icon={isSelected ? redIcon : undefined}
           >
- 
+      
             <Popup>
- 
+      
               <b>{site.sigla}</b>
- 
+      
               <br />
- 
+      
               {site.nome}
- 
+      
               <br />
- 
+      
               Operadora: {site.detentora}
- 
+      
             </Popup>
- 
+      
           </Marker>
+      
+        );
+      
+      })}
  
-        ))}
  
       </MapContainer>
  
