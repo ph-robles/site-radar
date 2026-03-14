@@ -29,7 +29,7 @@ type Site = {
   lon: number;
 };
  
-/* ---------------- ICONES ---------------- */
+/* ICONES */
  
 const defaultIcon = new L.Icon({
   iconUrl:
@@ -49,33 +49,7 @@ const redIcon = new L.Icon({
   iconAnchor: [12, 41],
 });
  
-/* ---------------- DISTANCIA ENTRE SITES ---------------- */
- 
-function calcDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-) {
- 
-  const R = 6371;
- 
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
- 
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
- 
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
- 
-  return R * c;
-}
- 
-/* ---------------- ZOOM NO SITE ---------------- */
+/* ZOOM NO SITE */
  
 function FlyToSite({ site }: { site: Site | null }) {
  
@@ -95,15 +69,12 @@ function FlyToSite({ site }: { site: Site | null }) {
   return null;
 }
  
-/* ---------------- MAPA ---------------- */
+/* MAPA */
  
 export default function MapView() {
  
   const [sites, setSites] = useState<Site[]>([]);
   const [selectedSite, setSelectedSite] = useState<Site | null>(null);
-  const [nearSites, setNearSites] = useState<any[]>([]);
- 
-  /* ----------- CARREGAR SITES ----------- */
  
   useEffect(() => {
  
@@ -121,79 +92,11 @@ export default function MapView() {
  
   }, []);
  
-  /* ----------- CALCULAR SITES PROXIMOS ----------- */
- 
-  useEffect(() => {
- 
-    if (!selectedSite) return;
- 
-    const nearby = sites
-      .filter((s) => s.id !== selectedSite.id)
-      .map((s) => {
- 
-        const distance = calcDistance(
-          Number(selectedSite.lat),
-          Number(selectedSite.lon),
-          Number(s.lat),
-          Number(s.lon)
-        );
- 
-        return {
-          ...s,
-          distance
-        };
- 
-      })
-      .filter((s) => s.distance <= 2)
-      .sort((a, b) => a.distance - b.distance);
- 
-    setNearSites(nearby);
- 
-  }, [selectedSite, sites]);
- 
   return (
  
     <div>
  
-      {/* BUSCA */}
- 
       <SearchBar onResult={setSelectedSite} />
- 
-      {/* LISTA DE SITES PROXIMOS */}
- 
-      {selectedSite && (
- 
-        <div
-          style={{
-            background: "#fff",
-            padding: 12,
-            marginBottom: 10,
-            borderRadius: 8,
-            border: "1px solid #ddd"
-          }}
-        >
- 
-          <b>Sites dentro de 2 km</b>
- 
-          {nearSites.length === 0 && (
-            <p>Nenhum site próximo</p>
-          )}
- 
-          {nearSites.map((s) => (
- 
-            <div key={s.id}>
- 
-              {s.sigla} — {s.distance.toFixed(2)} km
- 
-            </div>
- 
-          ))}
- 
-        </div>
- 
-      )}
- 
-      {/* MAPA */}
  
       <MapContainer
         center={[-22.9068, -43.1729]}
@@ -211,7 +114,7 @@ export default function MapView() {
  
         <FlyToSite site={selectedSite} />
  
-        {/* CIRCULO DE COBERTURA */}
+        {/* CIRCULO */}
  
         {selectedSite && (
  
@@ -230,7 +133,7 @@ export default function MapView() {
  
         )}
  
-        {/* CLUSTER DE SITES */}
+        {/* CLUSTER */}
  
         <MarkerClusterGroup>
  
@@ -267,13 +170,11 @@ export default function MapView() {
  
                     <br />
  
-                    <b>Lat:</b>{" "}
-                    {Number(site.lat).toFixed(5)}
+                    <b>Lat:</b> {Number(site.lat).toFixed(5)}
  
                     <br />
  
-                    <b>Lon:</b>{" "}
-                    {Number(site.lon).toFixed(5)}
+                    <b>Lon:</b> {Number(site.lon).toFixed(5)}
  
                   </div>
  
