@@ -9,7 +9,7 @@ export default function SearchBar({ onResult }: any) {
  
   async function handleSearch() {
  
-    const site = await searchSiteBySigla(sigla);
+    const site = await searchSiteBySigla(sigla.trim());
  
     if (site) {
       onResult(site);

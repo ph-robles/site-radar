@@ -18,7 +18,8 @@ export async function searchSiteBySigla(sigla: string) {
   const { data, error } = await supabase
     .from("sites")
     .select("id, sigla, nome, detentora, lat, lon")
-    .ilike("sigla", sigla);
+    .ilike("sigla", `%${sigla}%`)
+    .limit(1);
  
   if (error) {
     console.error("Erro ao buscar site:", error);
@@ -27,4 +28,3 @@ export async function searchSiteBySigla(sigla: string) {
  
   return data?.[0] ?? null;
 }
- 
