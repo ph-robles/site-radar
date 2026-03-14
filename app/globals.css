@@ -3,3 +3,5 @@
 @tailwind utilities;
 
 :root { color-scheme: light; }
+
+@import "leaflet/dist/leaflet.css";
