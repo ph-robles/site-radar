@@ -4,24 +4,24 @@ import { supabase } from "@/lib/supabaseClient";
 export async function GET(req: NextRequest) {
  
   const { searchParams } = new URL(req.url);
+  const q = searchParams.get("q");
  
-  const termo = searchParams.get("q");
- 
-  if (!termo || termo.length < 2) {
- 
-    return NextResponse.json({
-      sites: []
-    });
- 
+  if (!q || q.length < 2) {
+    return NextResponse.json({ sites: [] });
   }
+ 
+  const termo = q.trim().toUpperCase();
  
   const { data, error } = await supabase
     .from("sites")
-    .select("id,sigla,nome")
+    .select("id, sigla, nome")
     .ilike("sigla", `%${termo}%`)
+    .order("sigla")
     .limit(10);
  
   if (error) {
+ 
+    console.error(error);
  
     return NextResponse.json({
       sites: []
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
   }
  
   return NextResponse.json({
-    sites: data
+    sites: data ?? []
   });
  
 }
