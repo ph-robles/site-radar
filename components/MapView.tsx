@@ -7,23 +7,25 @@ import { getSites } from "@/services/sites";
 import SearchBar from "./SearchBar";
 import L from "leaflet";
  
-delete (L.Icon.Default.prototype as any)._getIconUrl;
- 
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+const defaultIcon = new L.Icon({
   iconUrl:
     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   shadowUrl:
     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});
-
-const redIcon = new L.Icon({
-  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
 });
+ 
+const redIcon = new L.Icon({
+  iconUrl:
+    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+  shadowUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
+
+
  
 type Site = {
   id: number;
@@ -102,11 +104,11 @@ export default function MapView() {
  
   return (
  
-          <Marker
-            key={site.id}
-            position={[Number(site.lat), Number(site.lon)]}
-            icon={isSelected ? redIcon : undefined}
-          >
+                <Marker
+                  key={site.id}
+                  position={[Number(site.lat), Number(site.lon)]}
+                  icon={selectedSite?.id === site.id ? redIcon : defaultIcon}
+                 >
       
             <Popup>
       
