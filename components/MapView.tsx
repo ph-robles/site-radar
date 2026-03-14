@@ -40,7 +40,7 @@ function FlyToSite({ site }: { site: Site | null }) {
  
   useEffect(() => {
     if (site) {
-      map.flyTo([site.lat, site.lon], 15);
+      map.flyTo([Number(site.lat), Number(site.lon)], 15);
     }
   }, [site, map]);
  
@@ -82,19 +82,19 @@ export default function MapView() {
  
         <FlyToSite site={selectedSite} />
 
-        {selectedSite && (
+        {selectedSite ? (
  
           <Circle
-            center={[selectedSite.lat, selectedSite.lon]}
+            center={[Number(selectedSite.lat), Number(selectedSite.lon)]}
             radius={2000}
             pathOptions={{
               color: "red",
               fillColor: "red",
-              fillOpacity: 0.1
+              fillOpacity: 0.1,
             }}
           />
         
-        )}
+        ) : null}
  
         {sites.map((site) => {
  
@@ -104,7 +104,7 @@ export default function MapView() {
  
           <Marker
             key={site.id}
-            position={[site.lat, site.lon]}
+            position={[Number(site.lat), Number(site.lon)]}
             icon={isSelected ? redIcon : undefined}
           >
       
