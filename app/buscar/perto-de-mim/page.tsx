@@ -6,7 +6,6 @@ import dynamic from "next/dynamic";
 import SiteCard from "@/components/SiteCard";
 import type { SiteNear } from "@/components/ErbMap";
  
-// Leaflet só no client
 const ErbMap = dynamic(() => import("@/components/ErbMap"), { ssr: false });
  
 export default function PertoDeMimPage() {
@@ -22,6 +21,7 @@ export default function PertoDeMimPage() {
 }
  
 function Inner() {
+ 
   const router = useRouter();
   const params = useSearchParams();
  
@@ -36,10 +36,15 @@ function Inner() {
   const [sites, setSites] = useState<SiteNear[]>([]);
   const [error, setError] = useState<string | null>(null);
  
-  // ⭐ melhor ERB (primeira da lista)
-  const melhorSite = sites.length > 0 ? sites[0] : null;
+  // ranking
+  const rankedSites = useMemo(() => {
+    return [...sites].sort((a, b) => a.distancia_m - b.distancia_m);
+  }, [sites]);
+ 
+  const melhorSite = rankedSites.length > 0 ? rankedSites[0] : null;
  
   const fetchSites = useCallback(async (lat: number, lng: number) => {
+ 
     const url = `/api/sites/near?lat=${encodeURIComponent(
       lat
     )}&lng=${encodeURIComponent(lng)}&radius=5000`;
@@ -52,10 +57,13 @@ function Inner() {
     const data: { sites?: SiteNear[] } = await res.json();
  
     setSites(Array.isArray(data.sites) ? data.sites : []);
+ 
   }, []);
  
   useEffect(() => {
+ 
     (async () => {
+ 
       if (!Number.isFinite(nlat) || !Number.isFinite(nlng)) {
         setLoading(false);
         return;
@@ -64,17 +72,22 @@ function Inner() {
       try {
         await fetchSites(nlat, nlng);
       } catch (e: unknown) {
+ 
         const msg =
           e instanceof Error ? e.message : "Erro ao buscar ERBs próximas.";
  
         setError(msg);
+ 
       } finally {
         setLoading(false);
       }
+ 
     })();
+ 
   }, [nlat, nlng, fetchSites]);
  
   const detectarAqui = () => {
+ 
     setError(null);
     setLoading(true);
  
@@ -86,11 +99,14 @@ function Inner() {
  
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+ 
         const { latitude, longitude } = pos.coords;
  
         router.replace(`/buscar/perto-de-mim?lat=${latitude}&lng=${longitude}`);
+ 
       },
       (err) => {
+ 
         setLoading(false);
  
         if (err.code === err.PERMISSION_DENIED)
@@ -100,9 +116,21 @@ function Inner() {
         else if (err.code === err.TIMEOUT)
           setError("Tempo esgotado ao obter localização.");
         else setError("Erro ao obter localização.");
+ 
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
+  };
+ 
+  // copiar coordenadas
+  const copiarCoordenadas = (lat: number, lon: number) => {
+ 
+    const texto = `${lat},${lon}`;
+ 
+    navigator.clipboard.writeText(texto);
+ 
+    alert("Coordenadas copiadas: " + texto);
+ 
   };
  
   const userPoint =
@@ -112,8 +140,11 @@ function Inner() {
  
   return (
     <>
+ 
       {!userPoint && !loading && (
+ 
         <div className="mb-6 space-y-3">
+ 
           <p className="text-sm text-gray-700">
             Parece que você acessou esta página sem fornecer a sua localização.
           </p>
@@ -124,19 +155,23 @@ function Inner() {
           >
             Detectar minha localização agora
           </button>
+ 
         </div>
+ 
       )}
  
       {loading && <p className="text-sm text-gray-600">Carregando...</p>}
  
       {error && <p className="text-sm text-red-600">{error}</p>}
  
-      {/* ⭐ Melhor ERB */}
+      {/* Melhor ERB */}
+ 
       {melhorSite && (
+ 
         <div className="mb-4 p-4 rounded-lg bg-green-100 border border-green-300">
  
           <h3 className="font-semibold text-green-800">
-          📡 Melhor ERB para conexão
+            📡 Melhor ERB para conexão
           </h3>
  
           <p className="text-sm">
@@ -151,37 +186,116 @@ function Inner() {
             capacitado: {melhorSite.capacitado}
           </p>
  
-          <a
-            href={`https://www.google.com/maps/dir/?api=1&destination=${melhorSite.lat},${melhorSite.lon}`}
-            target="_blank"
-            className="inline-block mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            🧭 Navegar até a ERB
-          </a>
+          <div className="flex gap-2 mt-3">
+ 
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&destination=${Number(
+                melhorSite.lat
+              )},${Number(melhorSite.lon)}`}
+              target="_blank"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              🧭 Navegar até a ERB
+            </a>
+ 
+            <button
+              onClick={() =>
+                copiarCoordenadas(Number(melhorSite.lat), Number(melhorSite.lon))
+              }
+              className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800"
+            >
+              📋 Copiar coordenadas
+            </button>
+ 
+          </div>
  
         </div>
-       )}
-      {userPoint && (
-        <div className="mb-6">
-          <ErbMap
-            user={userPoint}
-            sites={sites}
-            className="h-80 rounded-lg overflow-hidden shadow"
-          />
-        </div>
+ 
       )}
  
-      {!loading && !error && sites.length === 0 && userPoint && (
+      {userPoint && (
+ 
+        <div className="mb-6">
+ 
+          <ErbMap
+            user={userPoint}
+            sites={rankedSites}
+            className="h-80 rounded-lg overflow-hidden shadow"
+          />
+ 
+        </div>
+ 
+      )}
+ 
+      {!loading && !error && rankedSites.length === 0 && userPoint && (
+ 
         <p className="text-sm text-gray-600">
           Nenhuma ERB encontrada neste raio.
         </p>
+ 
       )}
  
-      <div className="mt-4 grid gap-3">
-        {sites.map((s) => (
-          <SiteCard key={s.id} site={s} />
-        ))}
+      {/* Ranking */}
+ 
+      <div className="mt-4">
+ 
+        <h3 className="text-lg font-semibold mb-2">
+          📡 Ranking das ERBs mais próximas
+        </h3>
+ 
+        <div className="grid gap-3">
+ 
+          {rankedSites.map((s, i) => (
+ 
+            <div
+              key={s.id}
+              className="p-3 border rounded-lg bg-white shadow-sm"
+            >
+ 
+              <p className="text-sm font-semibold">
+                #{i + 1} — {s.sigla}
+              </p>
+ 
+              <p className="text-xs text-gray-600">
+                distância: {Math.round(s.distancia_m)} m
+              </p>
+ 
+              <p className="text-xs text-gray-600">
+                capacitado: {s.capacitado}
+              </p>
+ 
+              <div className="flex gap-2 mt-2">
+ 
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${Number(
+                    s.lat
+                  )},${Number(s.lon)}`}
+                  target="_blank"
+                  className="text-xs bg-blue-600 text-white px-3 py-1 rounded"
+                >
+                  Navegar
+                </a>
+ 
+                <button
+                  onClick={() =>
+                    copiarCoordenadas(Number(s.lat), Number(s.lon))
+                  }
+                  className="text-xs bg-gray-700 text-white px-3 py-1 rounded"
+                >
+                  Copiar coordenadas
+                </button>
+ 
+              </div>
+ 
+            </div>
+ 
+          ))}
+ 
+        </div>
+ 
       </div>
+ 
     </>
   );
 }
+ 
