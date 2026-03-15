@@ -10,14 +10,24 @@ export async function POST(req: Request) {
  
   const body = await req.json();
  
-  const { site_id, portas_disponiveis, observacao } = body;
+  const {
+    site_id,
+    portas_disponiveis,
+    observacao,
+    foto_local,
+    foto_cadeado,
+    foto_portas
+  } = body;
  
   const { error } = await supabase
     .from("site_updates")
     .insert({
       site_id,
       portas_disponiveis,
-      observacao
+      observacao,
+      foto_local,
+      foto_cadeado,
+      foto_portas
     });
  
   if (error) {
