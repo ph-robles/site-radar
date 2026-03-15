@@ -32,43 +32,53 @@ export default function BuscarPorEnderecoPage() {
     setSites([]);
     setResolved(null);
  
-    if (!address) return;
+    if (!address || address.trim().length < 3) {
+      setError("Digite um endereço válido.");
+      return;
+    }
  
     setLoading(true);
  
     try {
  
+      // GEOCODE
       const geoRes = await fetch(
         `/api/geocode?q=${encodeURIComponent(address)}`,
         { cache: "no-store" }
       );
  
-      if (!geoRes.ok)
-        throw new Error("Falha ao geocodificar o endereço.");
+      if (!geoRes.ok) {
+        throw new Error("Erro ao buscar endereço.");
+      }
  
       const geo = await geoRes.json();
  
-      if (!geo || !geo.lat || !geo.lng)
+      // CORREÇÃO IMPORTANTE
+      if (!geo || geo.lat === undefined || geo.lng === undefined) {
         throw new Error("Endereço não encontrado.");
+      }
  
       setResolved({
         lat: geo.lat,
         lng: geo.lng,
-        label: geo.label,
+        label: geo.label || address,
       });
  
+      // BUSCAR ERBs
       const nearRes = await fetch(
         `/api/sites/near?lat=${geo.lat}&lng=${geo.lng}&radius=5000`,
         { cache: "no-store" }
       );
  
-      if (!nearRes.ok)
-        throw new Error("Falha ao buscar ERBs próximas.");
+      if (!nearRes.ok) {
+        throw new Error("Erro ao buscar ERBs próximas.");
+      }
  
       const data = await nearRes.json();
  
       let results: SiteNear[] = data.sites ?? [];
  
+      // PRIORIDADE CAPACITADA
       results.sort((a, b) => {
  
         if (a.capacitado && !b.capacitado) return -1;
@@ -84,7 +94,8 @@ export default function BuscarPorEnderecoPage() {
  
     } catch (e: any) {
  
-      setError(e.message);
+      console.error(e);
+      setError(e.message || "Erro inesperado.");
  
     } finally {
  
@@ -133,7 +144,7 @@ export default function BuscarPorEnderecoPage() {
         </p>
       )}
  
-      {!loading && !error && sites.length > 0 && (
+      {sites.length > 0 && (
  
         <div className="mt-6">
  
@@ -194,8 +205,6 @@ export default function BuscarPorEnderecoPage() {
  
                 </div>
  
-                {/* BOTÕES */}
- 
                 {s.lat && s.lon && (
  
                   <div className="flex gap-3 mt-4">
@@ -235,14 +244,6 @@ export default function BuscarPorEnderecoPage() {
           </div>
  
         </div>
- 
-      )}
- 
-      {!loading && !error && sites.length === 0 && (
- 
-        <p className="mt-4 text-sm text-gray-600">
-          Digite um endereço para iniciar.
-        </p>
  
       )}
  

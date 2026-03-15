@@ -1,31 +1,46 @@
 "use client";
+ 
 import { useState } from "react";
-
-export default function SearchInput({
-  placeholder,
-  onSearch,
-  buttonText = "Buscar",
-}: {
-  placeholder: string;
+ 
+type Props = {
+  placeholder?: string;
   onSearch: (value: string) => void;
-  buttonText?: string;
-}) {
+};
+ 
+export default function SearchInput({ placeholder, onSearch }: Props) {
+ 
   const [value, setValue] = useState("");
-
+ 
+  const handleSearch = () => {
+    onSearch(value);
+  };
+ 
   return (
+ 
     <div className="flex gap-2">
+ 
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
-        className="flex-1 rounded-md border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
+        className="border rounded px-3 py-2 w-full"
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            handleSearch();
+          }
+        }}
       />
+ 
       <button
-        onClick={() => onSearch(value.trim())}
-        className="rounded-md bg-emerald-600 text-white px-4 hover:bg-emerald-700"
+        onClick={handleSearch}
+        className="bg-blue-600 text-white px-4 py-2 rounded"
       >
-        {buttonText}
+        Buscar
       </button>
+ 
     </div>
+ 
   );
+ 
 }
+ 
