@@ -1,7 +1,15 @@
-import { getStatus } from "@/lib/status"
+import { getStatus } from "@/lib/status";
 
-export default function SiteCard({ site }: any) {
-    const status = getStatus(site.data_vencimento)
+interface Site {
+    sigla: string;
+    nome: string;
+    latitude: number;
+    longitude: number;
+    data_vencimento: string;
+}
+
+export default function SiteCard({ site }: { site: Site }) {
+    const status = getStatus(site.data_vencimento);
 
     return (
         <div className="p-4 rounded-2xl shadow bg-white space-y-2">
@@ -9,7 +17,7 @@ export default function SiteCard({ site }: any) {
             <h2 className="text-xl font-bold">{site.sigla}</h2>
             <p>{site.nome}</p>
 
-            <span className={`text-${status.color}-500 font-semibold`}>
+            <span className={`font-semibold text-${status.color}-500`}>
                 {status.label}
             </span>
 
@@ -32,5 +40,5 @@ export default function SiteCard({ site }: any) {
             </div>
 
         </div>
-    )
+    );
 }
