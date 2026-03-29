@@ -22,20 +22,18 @@ export default function RootLayout({
       </head>
 
       <body className={inter.className}>
-
-        {/* HEADER FIXO */}
+        {/* Header */}
         <header className="w-full bg-[#7300E6] text-white p-4 shadow-md relative">
           <h1 className="text-xl font-bold text-center">📡 Site Radar</h1>
         </header>
 
-        {/* MENU LATERAL */}
+        {/* Menu */}
         <DrawerMenu />
 
-        {/* CONTEÚDO */}
+        {/* Conteúdo */}
         <main className="p-4 max-w-3xl mx-auto bg-gray-100 min-h-screen">
           {children}
         </main>
-
       </body>
     </html>
   );
