@@ -37,6 +37,12 @@ export default function Home() {
         <button className="btn" onClick={() => router.push("/endereco")}>
           🧭 Buscar por ENDEREÇO
         </button>
+        <button
+          className="btn"
+          onClick={() => router.push("/proximo")}
+        >
+          📍 Próximo a mim
+        </button>
       </div>
 
       <hr style={{ margin: "24px 0" }} />

@@ -17,11 +17,11 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    /* 🔥 Estes 2 campos estavam faltando — esse era o problema */
+    /* AQUI ESTÁ O ALIAS — ESSENCIAL */
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "*"
+        "./*"
       ]
     },
     "plugins": [
@@ -40,4 +40,4 @@
   "exclude": [
     "node_modules"
   ]
-} 
+}
