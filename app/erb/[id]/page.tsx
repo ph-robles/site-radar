@@ -1,3 +1,4 @@
+
 import { supabase } from "@/lib/supabase";
 import { getStatus } from "@/lib/status";
 
@@ -45,12 +46,12 @@ export default async function ErbDetalhesPage({ params }: any) {
 
                 {site.capacitado === "SIM" && (
                     <span className="px-4 py-1 rounded-full font-semibold bg-purple-100 text-purple-700">
-                        ⚡ ERB Capacitada
+                        ⚡ Capacitada
                     </span>
                 )}
             </div>
 
-            {/* INFORMAÇÕES */}
+            {/* INFORMAÇÕES PRINCIPAIS */}
             <div className="bg-white shadow-md rounded-2xl p-5 space-y-3 border">
                 <p><b>Endereço:</b> {site.endereco}</p>
                 <p><b>Detentora:</b> {site.detentora}</p>
@@ -58,13 +59,14 @@ export default async function ErbDetalhesPage({ params }: any) {
                 <p><b>Longitude:</b> {site.lon}</p>
             </div>
 
-            {/* AÇÕES */}
+            {/* BOTÕES */}
             <div className="flex gap-3 mt-4">
 
                 <a
                     href={`https://www.google.com/maps?q=${site.lat},${site.lon}`}
                     target="_blank"
-                    className="px-4 py-3 flex-1 bg-[#7300E6] text-white rounded-xl font-semibold shadow hover:bg-[#4B0099] transition text-center"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 font-semibold underline"
                 >
                     Ver no Mapa
                 </a>
@@ -72,7 +74,8 @@ export default async function ErbDetalhesPage({ params }: any) {
                 <a
                     href={`https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}`}
                     target="_blank"
-                    className="px-4 py-3 flex-1 bg-[#A566FF] text-white rounded-xl font-semibold shadow hover:bg-[#7300E6] transition text-center"
+                    rel="noopener noreferrer"
+                    className="text-green-600 font-semibold underline"
                 >
                     Traçar Rota
                 </a>
