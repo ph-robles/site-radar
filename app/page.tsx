@@ -12,7 +12,7 @@ export default function HomePage() {
       <div className="bg-[var(--vivo-primary)] text-white p-6 rounded-2xl shadow-lg mb-6">
         <h1 className="text-3xl font-bold">📡 Site Radar</h1>
         <p className="opacity-90 mt-1">
-          Localize ERBs, veja rotas e informações com rapidez.
+          Localize ERBs, veja rotas e informações rapidamente.
         </p>
       </div>
 
@@ -52,7 +52,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* Mapa */}
+        {/* Mapa Geral */}
         <div
           onClick={() => router.push("/mapa")}
           className="bg-white shadow-md rounded-2xl p-5 flex flex-col items-center justify-center gap-2 cursor-pointer hover:shadow-xl transition col-span-2"
@@ -62,8 +62,8 @@ export default function HomePage() {
             Mapa Geral
           </p>
         </div>
-      </div>
 
+      </div>
     </main>
   );
 }
