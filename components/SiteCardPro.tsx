@@ -1,31 +1,29 @@
+import Link from "next/link";
 import { getStatus } from "@/lib/status";
 
 export default function SiteCardPro({ site }: { site: any }) {
     const status = getStatus(site.data_vencimento);
-    const distanciaKm = (site.distancia / 1000).toFixed(2);
+    const distanciaKm = site.distancia
+        ? (site.distancia / 1000).toFixed(2)
+        : null;
 
     return (
-        <div className="rounded-2xl shadow-md bg-white p-4 border border-gray-100 hover:shadow-lg transition-all">
-
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-gray-800">{site.sigla}</h2>
-
-                <span
-                    className={`text-sm px-2 py-1 rounded-full bg-${status.color}-100 text-${status.color}-700`}
-                >
-                    {status.label}
-                </span>
-            </div>
+        <div className="rounded-2xl shadow-md bg-white p-4 border hover:shadow-lg transition-all">
+            {/* SIGLA / LINK PARA DETALHES */}
+            <Link href={`/erb/${site.id}`}>
+                <h2 className="text-lg font-bold text-gray-800 hover:underline cursor-pointer">
+                    {site.sigla}
+                </h2>
+            </Link>
 
             {/* Nome / Endereço */}
-            <p className="text-gray-700 mt-1">{site.nome}</p>
+            <p className="text-gray-700">{site.nome}</p>
             <p className="text-gray-500 text-sm">{site.endereco}</p>
 
             {/* Distância */}
-            <p className="mt-3 text-gray-800 font-semibold">
-                📏 {distanciaKm} km
-            </p>
+            {distanciaKm && (
+                <p className="mt-2 font-semibold text-gray-800">📏 {distanciaKm} km</p>
+            )}
 
             {/* Capacitada */}
             {site.capacitado === "SIM" && (
@@ -36,25 +34,22 @@ export default function SiteCardPro({ site }: { site: any }) {
 
             {/* Botões */}
             <div className="flex gap-3 mt-4">
-                {/* Ver no mapa */}
                 <a
                     href={`https://www.google.com/maps?q=${site.lat},${site.lon}`}
                     target="_blank"
-                    className="flex-1 text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-xl"
+                    className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm"
                 >
-                    Ver no Mapa
+                    Ver no mapa
                 </a>
 
-                {/* Rota */}
                 <a
                     href={`https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}`}
                     target="_blank"
-                    className="flex-1 text-center bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-xl"
+                    className="px-3 py-2 bg-green-600 text-white rounded-lg text-sm"
                 >
-                    Rota
+                    Traçar rota
                 </a>
             </div>
-
         </div>
     );
 }
