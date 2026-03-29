@@ -1,11 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { getStatus } from "@/lib/status";
 
-export default async function ErbDetalhesPage({
-    params,
-}: {
-    params: { id: string };
-}) {
+export default async function ErbDetalhesPage({ params }: any) {
     const { data: site } = await supabase
         .from("sites")
         .select("*")
@@ -13,56 +9,74 @@ export default async function ErbDetalhesPage({
         .single();
 
     if (!site) {
-        return <p className="text-red-600">ERB não encontrada.</p>;
+        return (
+            <main className="p-4 text-center text-red-600 font-semibold">
+                ERB não encontrada.
+            </main>
+        );
     }
 
     const status = getStatus(site.data_vencimento);
 
     return (
-        <main className="p-4 space-y-4">
+        <main className="p-4 space-y-6 max-w-xl mx-auto">
+
+            {/* VOLTAR */}
             <button
                 onClick={() => history.back()}
-                className="px-4 py-2 bg-gray-300 rounded-lg"
+                className="bg-gray-200 px-4 py-2 rounded-xl shadow hover:bg-gray-300 transition"
             >
                 ⬅️ Voltar
             </button>
 
-            <h1 className="text-2xl font-bold">{site.sigla}</h1>
-            <p className="text-gray-700">{site.nome}</p>
+            {/* HEADER */}
+            <div className="bg-[#7300E6] text-white p-6 rounded-2xl shadow-lg">
+                <h1 className="text-3xl font-extrabold">{site.sigla}</h1>
+                <p className="opacity-90">{site.nome}</p>
+            </div>
 
-            <div className="flex gap-2">
-                <span className={`px-3 py-1 rounded-full bg-${status.color}-100 text-${status.color}-700`}>
+            {/* STATUS */}
+            <div className="flex gap-4">
+                <span
+                    className={`px-4 py-1 rounded-full font-semibold bg-${status.color}-100 text-${status.color}-700`}
+                >
                     {status.label}
                 </span>
 
                 {site.capacitado === "SIM" && (
-                    <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700">
-                        ⚡ Capacitada
+                    <span className="px-4 py-1 rounded-full font-semibold bg-purple-100 text-purple-700">
+                        ⚡ ERB Capacitada
                     </span>
                 )}
             </div>
 
-            <p className="text-gray-600">{site.endereco}</p>
+            {/* INFORMAÇÕES */}
+            <div className="bg-white shadow-md rounded-2xl p-5 space-y-3 border">
+                <p><b>Endereço:</b> {site.endereco}</p>
+                <p><b>Detentora:</b> {site.detentora}</p>
+                <p><b>Latitude:</b> {site.lat}</p>
+                <p><b>Longitude:</b> {site.lon}</p>
+            </div>
 
-            <p className="font-semibold">📡 Latitude: {site.lat}</p>
-            <p className="font-semibold">📡 Longitude: {site.lon}</p>
-
+            {/* AÇÕES */}
             <div className="flex gap-3 mt-4">
+
                 <a
                     href={`https://www.google.com/maps?q=${site.lat},${site.lon}`}
                     target="_blank"
-                    className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm"
+                    className="px-4 py-3 flex-1 bg-[#7300E6] text-white rounded-xl font-semibold shadow hover:bg-[#4B0099] transition text-center"
                 >
-                    Ver no mapa
+                    Ver no Mapa
                 </a>
 
                 <a
                     href={`https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}`}
                     target="_blank"
-                    className="px-3 py-2 bg-green-600 text-white rounded-lg text-sm"
+                    className="px-4 py-3 flex-1 bg-[#A566FF] text-white rounded-xl font-semibold shadow hover:bg-[#7300E6] transition text-center"
                 >
-                    Traçar rota
+                    Traçar Rota
                 </a>
+
             </div>
         </main>
     );
