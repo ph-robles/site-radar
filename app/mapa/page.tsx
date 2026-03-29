@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Loader from "@/components/Loader";
 import { buscarSitesProximos } from "@/services/sites";
+import 'leaflet/dist/leaflet.css';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+
+// importa a correção dos ícones
+import "../leaflet-icons";
 
 // IMPORTA O MAPA SÓ NO CLIENTE
 const MapaLeaflet = dynamic(() => import("@/components/MapaLeaflet"), {
