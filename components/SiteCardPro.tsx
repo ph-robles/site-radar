@@ -9,7 +9,8 @@ export default function SiteCardPro({ site }: { site: any }) {
 
     return (
         <div className="rounded-2xl shadow-md bg-white p-4 border hover:shadow-lg transition-all">
-            {/* SIGLA / LINK PARA DETALHES */}
+
+            {/* SIGLA → ABRE DETALHES */}
             <Link href={`/erb/${site.id}`}>
                 <h2 className="text-lg font-bold text-gray-800 hover:underline cursor-pointer">
                     {site.sigla}
@@ -22,7 +23,9 @@ export default function SiteCardPro({ site }: { site: any }) {
 
             {/* Distância */}
             {distanciaKm && (
-                <p className="mt-2 font-semibold text-gray-800">📏 {distanciaKm} km</p>
+                <p className="mt-2 font-semibold text-gray-800">
+                    📏 {distanciaKm} km
+                </p>
             )}
 
             {/* Capacitada */}
@@ -34,10 +37,12 @@ export default function SiteCardPro({ site }: { site: any }) {
 
             {/* Botões */}
             <div className="flex gap-3 mt-4">
+
                 <a
                     href={`https://www.google.com/maps?q=${site.lat},${site.lon}`}
                     target="_blank"
-                    className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 font-semibold underline"
                 >
                     Ver no mapa
                 </a>
@@ -45,10 +50,12 @@ export default function SiteCardPro({ site }: { site: any }) {
                 <a
                     href={`https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}`}
                     target="_blank"
-                    className="px-3 py-2 bg-green-600 text-white rounded-lg text-sm"
+                    rel="noopener noreferrer"
+                    className="text-green-600 font-semibold underline"
                 >
                     Traçar rota
                 </a>
+
             </div>
         </div>
     );
