@@ -85,10 +85,27 @@ body {
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
 }
 
+
 :root {
   --vivo-primary: #7300E6;
+  --vivo-primary-dark: #4B0099;
   --vivo-secondary: #A566FF;
-  --vivo-dark: #4B0099;
   --vivo-gray: #4D4D4D;
   --vivo-light: #F2F2F2;
+  --radius: 18px;
+}
+
+.btn-vivo {
+  background: var(--vivo-primary);
+  color: white;
+  padding: 14px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-radius: var(--radius);
+  width: 100%;
+  transition: 0.2s ease-in-out;
+}
+
+.btn-vivo:hover {
+  background: var(--vivo-primary-dark);
 }

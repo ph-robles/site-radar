@@ -1,65 +1,69 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-export default function Home() {
+export default function HomePage() {
   const router = useRouter();
 
   return (
-    <main style={{ maxWidth: 960, margin: "24px auto", padding: 16 }}>
+    <main className="p-4 max-w-xl mx-auto">
 
-      {/* Logo */}
-      <div style={{ marginBottom: 8 }}>
-        <Image
-          src="/logo.png"
-          width={220}
-          height={80}
-          alt="Logo"
-          priority
-        />
+      {/* HEADER VISUAL */}
+      <div className="bg-[var(--vivo-primary)] text-white p-6 rounded-2xl shadow-lg mb-6">
+        <h1 className="text-3xl font-bold">📡 Site Radar</h1>
+        <p className="opacity-90 mt-1">
+          Localize ERBs, veja rotas e informações com rapidez.
+        </p>
       </div>
 
-      <h1>📡 Localizar Site/ERB</h1>
-      <h3>Selecione uma opção abaixo:</h3>
+      {/* GRID DE NAVEGAÇÃO */}
+      <div className="grid grid-cols-2 gap-4">
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 12,
-          marginTop: 16,
-        }}
-      >
-        <button className="btn" onClick={() => router.push("/buscar")}>
-          🔍 Buscar por SIGLA
-        </button>
-        <button className="btn" onClick={() => router.push("/endereco")}>
-          🧭 Buscar por ENDEREÇO
-        </button>
-        <button
-          className="btn"
+        {/* Buscar por Sigla */}
+        <div
+          onClick={() => router.push("/buscar")}
+          className="bg-white shadow-md rounded-2xl p-5 flex flex-col items-center justify-center gap-2 cursor-pointer hover:shadow-xl transition"
+        >
+          <span className="text-4xl">🔍</span>
+          <p className="font-semibold text-[var(--vivo-primary)] text-center">
+            Buscar por Sigla
+          </p>
+        </div>
+
+        {/* Buscar por Endereço */}
+        <div
+          onClick={() => router.push("/endereco")}
+          className="bg-white shadow-md rounded-2xl p-5 flex flex-col items-center justify-center gap-2 cursor-pointer hover:shadow-xl transition"
+        >
+          <span className="text-4xl">🧭</span>
+          <p className="font-semibold text-[var(--vivo-primary)] text-center">
+            Buscar por Endereço
+          </p>
+        </div>
+
+        {/* Próximo a mim */}
+        <div
           onClick={() => router.push("/proximo")}
+          className="bg-white shadow-md rounded-2xl p-5 flex flex-col items-center justify-center gap-2 cursor-pointer hover:shadow-xl transition col-span-2"
         >
-          📍 Próximo a mim
-        </button>
-        <button className="btn" onClick={() => router.push("/mapa")}>
-          🗺️ Mapa das ERBs
-        </button>
+          <span className="text-4xl">📍</span>
+          <p className="font-semibold text-[var(--vivo-primary)] text-center">
+            ERBs Próximas
+          </p>
+        </div>
+
+        {/* Mapa */}
+        <div
+          onClick={() => router.push("/mapa")}
+          className="bg-white shadow-md rounded-2xl p-5 flex flex-col items-center justify-center gap-2 cursor-pointer hover:shadow-xl transition col-span-2"
+        >
+          <span className="text-4xl">🗺️</span>
+          <p className="font-semibold text-[var(--vivo-primary)] text-center">
+            Mapa Geral
+          </p>
+        </div>
       </div>
 
-      <hr style={{ margin: "24px 0" }} />
-
-      <div style={{ textAlign: "center", color: "#666" }}>
-        ❤️ Desenvolvido por Raphael Robles — © 2026 • 🚀{" "}
-        <a
-          href="https://busca-sites-b2b.streamlit.app/Sobre"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Sobre o App TowerLink
-        </a>
-      </div>
     </main>
   );
 }
