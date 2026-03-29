@@ -24,11 +24,11 @@ export default function SiteCardPro({ site }: { site: any }) {
 
             {/* Distância */}
             <p className="mt-3 text-gray-800 font-semibold">
-                📏 {distanciaKm} km de distância
+                📏 {distanciaKm} km
             </p>
 
             {/* Capacitada */}
-            {site.capacitado === "sim" && (
+            {site.capacitado === "SIM" && (
                 <span className="inline-block mt-2 text-xs font-semibold px-2 py-1 bg-purple-100 text-purple-700 rounded-full">
                     ⚡ ERB Capacitada
                 </span>
@@ -36,21 +36,9 @@ export default function SiteCardPro({ site }: { site: any }) {
 
             {/* Botões */}
             <div className="flex gap-2 mt-4">
-                <a
-                    href={`https://www.google.com/maps?q=${site.lat},${site.lon}`}
-                    target="_blank"
-                    className="flex-1 text-center bg-blue-500 text-white px-3 py-2 rounded-lg"
-                >
-                    Ver no mapa
-                </a>
+                {`https://www.google.com/maps?q=${site.lat},${site.lon}`}
 
-                <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}`}
-                    target="_blank"
-                    className="flex-1 text-center bg-green-500 text-white px-3 py-2 rounded-lg"
-                >
-                    Rota
-                </a>
+                {`https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}`}
             </div>
         </div>
     );

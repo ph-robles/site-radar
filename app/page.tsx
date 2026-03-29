@@ -43,6 +43,9 @@ export default function Home() {
         >
           📍 Próximo a mim
         </button>
+        <button className="btn" onClick={() => router.push("/mapa")}>
+          🗺️ Mapa das ERBs
+        </button>
       </div>
 
       <hr style={{ margin: "24px 0" }} />

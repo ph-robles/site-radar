@@ -77,3 +77,10 @@ body {
   border-color: rgba(49, 51, 63, 0.4);
   transform: translateY(-1px);
 }
+
+.leaflet-container {
+  height: 500px;
+  width: 100%;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+}

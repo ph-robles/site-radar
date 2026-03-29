@@ -47,7 +47,7 @@ export default function ProximoPage() {
             {loading && (
                 <div className="flex flex-col items-center gap-3 mt-10">
                     <Loader />
-                    <p className="text-gray-500 text-sm">Buscando localização...</p>
+                    <p className="text-gray-500 text-sm">Buscando localização…</p>
                 </div>
             )}
 

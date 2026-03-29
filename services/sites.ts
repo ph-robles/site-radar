@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 
-// Buscar site por SIGLA (usado no BuscarPage)
+// Buscar site por sigla
 export async function buscarSitePorSigla(sigla: string) {
   const { data, error } = await supabase
     .from("sites")
@@ -9,11 +9,10 @@ export async function buscarSitePorSigla(sigla: string) {
     .single();
 
   if (error) throw error;
-
   return data;
 }
 
-// Buscar sites mais próximos (usado no Próximo a mim)
+// Buscar ERBs próximas + capacitada
 export async function buscarSitesProximos(lat: number, lon: number) {
   const { data, error } = await supabase.rpc("buscar_sites_proximos", {
     user_lat: lat,
@@ -21,6 +20,5 @@ export async function buscarSitesProximos(lat: number, lon: number) {
   });
 
   if (error) throw error;
-
   return data;
 }
