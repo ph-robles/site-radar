@@ -5,7 +5,7 @@ export default function SiteCardPro({ site }: { site: any }) {
     const distanciaKm = (site.distancia / 1000).toFixed(2);
 
     return (
-        <div className="rounded-2xl shadow-md bg-white p-4 border border-gray-100 hover:shadow-lg transition">
+        <div className="rounded-2xl shadow-md bg-white p-4 border border-gray-100 hover:shadow-lg transition-all">
 
             {/* Header */}
             <div className="flex items-center justify-between">
@@ -19,7 +19,7 @@ export default function SiteCardPro({ site }: { site: any }) {
             </div>
 
             {/* Nome / Endereço */}
-            <p className="text-gray-600 mt-1">{site.nome}</p>
+            <p className="text-gray-700 mt-1">{site.nome}</p>
             <p className="text-gray-500 text-sm">{site.endereco}</p>
 
             {/* Distância */}
@@ -35,11 +35,26 @@ export default function SiteCardPro({ site }: { site: any }) {
             )}
 
             {/* Botões */}
-            <div className="flex gap-2 mt-4">
-                {`https://www.google.com/maps?q=${site.lat},${site.lon}`}
+            <div className="flex gap-3 mt-4">
+                {/* Ver no mapa */}
+                <a
+                    href={`https://www.google.com/maps?q=${site.lat},${site.lon}`}
+                    target="_blank"
+                    className="flex-1 text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-xl"
+                >
+                    Ver no Mapa
+                </a>
 
-                {`https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}`}
+                {/* Rota */}
+                <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}`}
+                    target="_blank"
+                    className="flex-1 text-center bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-xl"
+                >
+                    Rota
+                </a>
             </div>
+
         </div>
     );
 }

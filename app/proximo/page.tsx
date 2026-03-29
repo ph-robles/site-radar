@@ -11,46 +11,29 @@ export default function ProximoPage() {
     const [sites, setSites] = useState<any[]>([]);
 
     useEffect(() => {
-        async function load() {
-            try {
-                setLoading(true);
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
 
-                navigator.geolocation.getCurrentPosition(
-                    async (pos) => {
-                        const lat = pos.coords.latitude;
-                        const lon = pos.coords.longitude;
-
-                        const resultado = await buscarSitesProximos(lat, lon);
-
-                        setSites(resultado);
-                        setLoading(false);
-                    },
-                    () => {
-                        setErro("Para usar esta função, permita o acesso à sua localização.");
-                        setLoading(false);
-                    }
-                );
-            } catch {
-                setErro("Erro ao obter localização.");
+                const resultado = await buscarSitesProximos(lat, lon);
+                setSites(resultado);
+                setLoading(false);
+            },
+            () => {
+                setErro("Permita o acesso à localização para continuar.");
                 setLoading(false);
             }
-        }
-
-        load();
+        );
     }, []);
 
     return (
         <main className="p-4 max-w-xl mx-auto space-y-4">
-            <h1 className="text-2xl font-bold text-gray-800">📍 ERBs próximas de você</h1>
-            <p className="text-gray-600 -mt-2">Localizando as torres usando GPS...</p>
+            <h1 className="text-2xl font-bold text-gray-800">
+                📍 ERBs próximas de você
+            </h1>
 
-            {loading && (
-                <div className="flex flex-col items-center gap-3 mt-10">
-                    <Loader />
-                    <p className="text-gray-500 text-sm">Buscando localização…</p>
-                </div>
-            )}
-
+            {loading && <Loader />}
             {erro && <p className="text-red-500">{erro}</p>}
 
             <div className="space-y-4">
