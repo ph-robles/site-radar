@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import MenuLateral from "@/components/MenuLateral";
+import DrawerMenu from "@/components/DrawerMenu";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,11 +22,20 @@ export default function RootLayout({
       </head>
 
       <body className={inter.className}>
-        <MenuLateral />
 
-        <main className="p-4 max-w-3xl mx-auto min-h-screen bg-gray-100">
+        {/* HEADER FIXO */}
+        <header className="w-full bg-[#7300E6] text-white p-4 shadow-md relative">
+          <h1 className="text-xl font-bold text-center">📡 Site Radar</h1>
+        </header>
+
+        {/* MENU LATERAL */}
+        <DrawerMenu />
+
+        {/* CONTEÚDO */}
+        <main className="p-4 max-w-3xl mx-auto bg-gray-100 min-h-screen">
           {children}
         </main>
+
       </body>
     </html>
   );

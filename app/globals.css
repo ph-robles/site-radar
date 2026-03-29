@@ -85,3 +85,10 @@ body {
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
 }
 
+:root {
+  --vivo-primary: #7300E6;
+  --vivo-secondary: #A566FF;
+  --vivo-dark: #4B0099;
+  --vivo-gray: #4D4D4D;
+  --vivo-light: #F2F2F2;
+}
