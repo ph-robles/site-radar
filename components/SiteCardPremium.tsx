@@ -4,15 +4,13 @@ import { getStatus } from "@/lib/status";
 
 export default function SiteCardPremium({ site }: { site: any }) {
     const status = getStatus(site.data_vencimento);
-    const distanciaKm = site.distancia
-        ? (site.distancia / 1000).toFixed(2)
-        : null;
+    const distanciaKm = site.distancia ? (site.distancia / 1000).toFixed(2) : null;
 
     return (
         <div className="rounded-2xl bg-white shadow-lg border p-5 hover:shadow-2xl transition">
 
             <Link href={`/erb/${site.id}`}>
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-2 cursor-pointer">
                     <h2 className="text-2xl font-bold text-[#7300E6] hover:underline">
                         {site.sigla}
                     </h2>
@@ -41,25 +39,21 @@ export default function SiteCardPremium({ site }: { site: any }) {
             )}
 
             <div className="flex gap-3 mt-4">
-
                 <a
                     href={`https://www.google.com/maps?q=${site.lat},${site.lon}`}
                     target="_blank"
-                    rel="noopener noreferrer"
                     className="text-blue-600 font-semibold underline"
                 >
-                    Ver no Mapa
+                    Ver no mapa
                 </a>
 
                 <a
                     href={`https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}`}
                     target="_blank"
-                    rel="noopener noreferrer"
                     className="text-green-600 font-semibold underline"
                 >
-                    Traçar Rota
+                    Traçar rota
                 </a>
-
             </div>
         </div>
     );
