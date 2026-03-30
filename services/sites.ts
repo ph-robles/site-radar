@@ -22,3 +22,14 @@ export async function buscarSitesProximos(lat: number, lon: number) {
   if (error) throw error;
   return data;
 }
+
+export async function buscarSugestoesSigla(parcial: string) {
+  const { data, error } = await supabase
+    .from("sites")
+    .select("id, sigla, nome")
+    .ilike("sigla", `${parcial}%`)
+    .limit(5);
+
+  if (error) throw error;
+  return data;
+}
