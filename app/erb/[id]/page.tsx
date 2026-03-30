@@ -1,11 +1,51 @@
+"use client";
+
 import { supabase } from "@/lib/supabase";
 import { getStatus } from "@/lib/status";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-const router = useRouter();
-
-export default async function ErbDetalhesPage({ params }: any) {
+export default function ErbDetalhesPage({ params }: any) {
+    const router = useRouter();
     const id = Number(params.id);
+
+    const [site, setSite] = useState<any>(null);
+    const [status, setStatus] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchData() {
+            if (!id) {
+                setLoading(false);
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from("sites")
+                .select("*")
+                .eq("id", id)
+                .single();
+
+            if (!data || error) {
+                setSite(null);
+            } else {
+                setSite(data);
+                setStatus(getStatus(data.data_vencimento));
+            }
+
+            setLoading(false);
+        }
+
+        fetchData();
+    }, [id]);
+
+    if (loading) {
+        return (
+            <main className="p-4 text-center font-semibold">
+                Carregando...
+            </main>
+        );
+    }
 
     if (!id) {
         return (
@@ -15,21 +55,13 @@ export default async function ErbDetalhesPage({ params }: any) {
         );
     }
 
-    const { data: site, error } = await supabase
-        .from("sites")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-    if (!site || error) {
+    if (!site) {
         return (
             <main className="p-4 text-center text-red-600 font-semibold">
                 ERB não encontrada.
             </main>
         );
     }
-
-    const status = getStatus(site.data_vencimento);
 
     return (
         <main className="p-4 space-y-6 max-w-xl mx-auto">
