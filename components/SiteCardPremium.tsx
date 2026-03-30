@@ -31,9 +31,9 @@ export default function SiteCardPremium({ site }: { site: any }) {
             <p className="text-gray-700 text-lg font-medium">{site.nome}</p>
             <p className="text-gray-500 text-sm">{site.endereco}</p>
 
-            {/* Data de vencimento */}
-            <div className="mt-3">
-                <p className="text-sm text-black">
+            {/* Vencimento Premium */}
+            <div className="mt-3 text-black">
+                <p className="text-sm">
                     <b>Vencimento:</b> {formatarData(site.data_vencimento)}
                 </p>
 
@@ -42,7 +42,11 @@ export default function SiteCardPremium({ site }: { site: any }) {
                 >
                     {status.label}
                 </span>
+
+                <p className="text-sm mt-1 font-semibold">{status.mensagem}</p>
             </div>
+
+
 
             {/* Distância */}
             {distanciaKm && (
@@ -59,14 +63,7 @@ export default function SiteCardPremium({ site }: { site: any }) {
             )}
 
 
-            {/* Vencimento Premium */}
-            <div className="mt-3 text-black">
-                <p className="text-sm">
-                    <b>Vencimento:</b> {formatarData(site.data_vencimento)}
-                </p>
 
-                <p className="text-sm mt-1 font-semibold">{status.mensagem}</p>
-            </div>
 
 
             {/* Botões de Mapa e Rota */}
