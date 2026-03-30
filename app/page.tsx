@@ -12,7 +12,7 @@ export default function HomePage() {
       <div className="bg-[#7300E6] text-white p-6 rounded-2xl shadow-lg mb-8">
         <h1 className="text-3xl font-extrabold tracking-tight">📡 Site Radar</h1>
         <p className="opacity-95 text-sm mt-1">
-          Consulte ERBs, rotas, mapas e detalhes com visual profissional.
+          Consulte ERBs, rotas, mapas e detalhes técnicos dos sites.
         </p>
       </div>
 
