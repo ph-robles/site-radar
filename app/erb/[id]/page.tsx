@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import DistanciaCliente from "@/components/DistanciaCliente";
 import BotoesPremium from "@/components/BotoesPremium";
+import MiniMapa from "@/components/MiniMapa";
+
 
 export default function ErbDetalhesPage({ params }: any) {
     const router = useRouter();
@@ -82,6 +84,8 @@ export default function ErbDetalhesPage({ params }: any) {
                 <p className="text-white/90">{site.nome}</p>
             </div>
 
+            <MiniMapa lat={site.lat} lon={site.lon} />
+
             <DistanciaCliente lat={site.lat} lon={site.lon} />
 
             {/* Status */}
@@ -109,6 +113,37 @@ export default function ErbDetalhesPage({ params }: any) {
 
             {/* Botões Premium */}
             <BotoesPremium lat={site.lat} lon={site.lon} />
+
+            {/* Detalhes técnicos */}
+            <div className="bg-white shadow-md rounded-2xl p-5 space-y-3 border text-black">
+                <h2 className="text-xl font-bold text-[#7300E6]">🔧 Detalhes Técnicos</h2>
+
+                <div className="space-y-1">
+                    <p><b>ID Interno:</b> {site.id}</p>
+                    <p><b>Sigla:</b> {site.sigla}</p>
+                    <p><b>Detentora:</b> {site.detentora}</p>
+                </div>
+
+                <div className="space-y-1">
+                    <p><b>Latitude:</b> {site.lat}</p>
+                    <p><b>Longitude:</b> {site.lon}</p>
+                </div>
+
+                <div className="space-y-1">
+                    <p><b>Status:</b> {status.label}</p>
+                    <p><b>Capacitada:</b> {site.capacitado}</p>
+                </div>
+
+                <div className="pt-2 text-sm text-gray-600">
+                    <p>Mais detalhes técnicos podem ser adicionados futuramente, como:</p>
+                    <ul className="list-disc pl-6">
+                        <li>Banda / Tecnologia (700 / 1800 / DSS / 5G)</li>
+                        <li>Setores</li>
+                        <li>Azimute</li>
+                        <li>Altura da Torre</li>
+                    </ul>
+                </div>
+            </div>
 
 
 
