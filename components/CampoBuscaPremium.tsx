@@ -2,6 +2,34 @@
 
 import { useState } from "react";
 
+export function normalizarSigla(texto: string): string {
+    if (!texto) return "";
+
+    let t = texto.toUpperCase();
+
+    // Remove espaços
+    t = t.replace(/\s+/g, "");
+
+    // Remove caracteres especiais
+    t = t.replace(/[^A-Z0-9]/g, "");
+
+    // Remove "RJ" duplicado
+    // Ex: RJRJF001 → RJF001
+    while (t.startsWith("RJRJ")) {
+        t = t.replace(/^RJRJ/, "RJ");
+    }
+
+    // Remove prefixo RJ se houver e se sobrar conteúdo depois
+    // Ex: RJDU → DU | RJF001 → F001
+    if (t.startsWith("RJ") && t.length > 2) {
+        t = t.slice(2);
+    }
+
+    // Caso digite só 3 letras — "dju", "f01" → ok
+    return t;
+}
+
+
 export default function CampoBuscaPremium({ onBuscar }: { onBuscar: (valor: string) => void }) {
     const [valor, setValor] = useState("");
 
