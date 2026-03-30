@@ -33,10 +33,9 @@ export default async function ErbDetalhesPage({ params }: any) {
         <main className="p-4 space-y-6 max-w-xl mx-auto">
 
             {/* BOTÃO VOLTAR */}
-            <button
-                onClick={() => history.back()}
-                className="bg-gray-200 px-4 py-2 rounded-xl shadow hover:bg-gray-300 transition"
-            >
+            <button onClick={() => history.back()} className="bg-gray-200 px-4 py-2 rounded-xl shadow hover:bg-gray-300 transition" >
+
+
                 ⬅️ Voltar
             </button>
 
@@ -48,9 +47,8 @@ export default async function ErbDetalhesPage({ params }: any) {
 
             {/* STATUS */}
             <div className="flex gap-4">
-                <span
-                    className={`px-4 py-1 rounded-full font-semibold bg-${status.color}-100 text-${status.color}-700`}
-                >
+                <span className={`px-4 py-1 rounded-full font-semibold bg-${status.color}-100 text-${status.color}-700`}>
+
                     {status.label}
                 </span>
 
