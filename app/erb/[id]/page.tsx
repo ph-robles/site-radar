@@ -5,6 +5,7 @@ import { getStatus } from "@/lib/status";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import DistanciaCliente from "@/components/DistanciaCliente";
+import BotoesPremium from "@/components/BotoesPremium";
 
 export default function ErbDetalhesPage({ params }: any) {
     const router = useRouter();
@@ -75,16 +76,16 @@ export default function ErbDetalhesPage({ params }: any) {
                 ⬅️ Voltar
             </button>
 
-            {/* Cabeçalho */}
+            {/* Cabeçalho Vivo Premium */}
             <div className="bg-[#7300E6] text-white p-6 rounded-2xl shadow-lg">
                 <h1 className="text-3xl font-extrabold">{site.sigla}</h1>
-                <p className="opacity-90">{site.nome}</p>
+                <p className="text-white/90">{site.nome}</p>
             </div>
 
             <DistanciaCliente lat={site.lat} lon={site.lon} />
 
             {/* Status */}
-            <div className="flex gap-4">
+            <div className="flex gap-3">
                 <span
                     className={`px-4 py-1 rounded-full font-semibold bg-${status.color}-100 text-${status.color}-700`}
                 >
@@ -98,7 +99,7 @@ export default function ErbDetalhesPage({ params }: any) {
                 )}
             </div>
 
-            {/* Informações */}
+            {/* Informações da ERB */}
             <div className="bg-white shadow-md rounded-2xl p-5 space-y-3 border">
                 <p><b>Endereço:</b> {site.endereco}</p>
                 <p><b>Detentora:</b> {site.detentora}</p>
@@ -106,28 +107,10 @@ export default function ErbDetalhesPage({ params }: any) {
                 <p><b>Longitude:</b> {site.lon}</p>
             </div>
 
-            {/* Ações */}
-            <div className="flex gap-3 mt-4">
+            {/* Botões Premium */}
+            <BotoesPremium lat={site.lat} lon={site.lon} />
 
-                <a
-                    href={`https://www.google.com/maps?q=${site.lat},${site.lon}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-xl shadow hover:bg-blue-700 transition"
-                >
-                    Ver no Mapa
-                </a>
 
-                <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-green-600 text-white px-4 py-2 rounded-xl shadow hover:bg-green-700 transition"
-                >
-                    Traçar rota
-                </a>
-
-            </div>
 
         </main>
     );
