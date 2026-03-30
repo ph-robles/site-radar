@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { getStatus } from "@/lib/status";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import DistanciaCliente from "@/components/DistanciaCliente";
 
 export default function ErbDetalhesPage({ params }: any) {
     const router = useRouter();
@@ -79,6 +80,8 @@ export default function ErbDetalhesPage({ params }: any) {
                 <h1 className="text-3xl font-extrabold">{site.sigla}</h1>
                 <p className="opacity-90">{site.nome}</p>
             </div>
+
+            <DistanciaCliente lat={site.lat} lon={site.lon} />
 
             {/* Status */}
             <div className="flex gap-4">
