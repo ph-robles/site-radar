@@ -1,6 +1,6 @@
 
 import Link from "next/link";
-import { getStatus } from "@/lib/status";
+import { getStatus, formatarData } from "@/lib/status";
 
 export default function SiteCardPremium({ site }: { site: any }) {
     const status = getStatus(site.data_vencimento);
@@ -30,6 +30,19 @@ export default function SiteCardPremium({ site }: { site: any }) {
             {/* Nome e endereço */}
             <p className="text-gray-700 text-lg font-medium">{site.nome}</p>
             <p className="text-gray-500 text-sm">{site.endereco}</p>
+
+            {/* Data de vencimento */}
+            <div className="mt-3">
+                <p className="text-sm text-black">
+                    <b>Vencimento:</b> {formatarData(site.data_vencimento)}
+                </p>
+
+                <span
+                    className={`inline-block mt-1 text-xs font-bold px-3 py-1 rounded-full bg-${status.color}-100 text-${status.color}-700`}
+                >
+                    {status.label}
+                </span>
+            </div>
 
             {/* Distância */}
             {distanciaKm && (
