@@ -1,9 +1,9 @@
 
 import Link from "next/link";
-import { getStatus, formatarData } from "@/lib/status";
+import { getStatusPremium, formatarData } from "@/lib/status";
 
 export default function SiteCardPremium({ site }: { site: any }) {
-    const status = getStatus(site.data_vencimento);
+    const status = getStatusPremium(site.data_vencimento);
     const distanciaKm =
         site.distancia ? (site.distancia / 1000).toFixed(2) : null;
 
@@ -57,6 +57,17 @@ export default function SiteCardPremium({ site }: { site: any }) {
                     ⚡ ERB Capacitada
                 </span>
             )}
+
+
+            {/* Vencimento Premium */}
+            <div className="mt-3 text-black">
+                <p className="text-sm">
+                    <b>Vencimento:</b> {formatarData(site.data_vencimento)}
+                </p>
+
+                <p className="text-sm mt-1 font-semibold">{status.mensagem}</p>
+            </div>
+
 
             {/* Botões de Mapa e Rota */}
             <div className="flex gap-3 mt-4">
