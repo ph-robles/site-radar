@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Loader from "@/components/Loader";
-import SiteCardPro from "@/components/SiteCardPro";
+import SiteCardPremium from "@/components/SiteCardPremium";
 import { buscarSitesProximos } from "@/services/sites";
 
 export default function ProximoPage() {
@@ -37,8 +37,8 @@ export default function ProximoPage() {
             {erro && <p className="text-red-500">{erro}</p>}
 
             <div className="space-y-4">
-                {sites.map((site, index) => (
-                    <SiteCardPro key={index} site={site} />
+                {sites.map((s, i) => (
+                    <SiteCardPremium key={i} site={s} />
                 ))}
             </div>
         </main>

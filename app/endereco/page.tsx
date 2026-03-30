@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Loader from "@/components/Loader";
-import SiteCardPro from "@/components/SiteCardPro";
+import SiteCardPremium from "@/components/SiteCardPremium";
 import { geocodeEndereco } from "@/services/geocode";
 import { buscarSitesProximos } from "@/services/sites";
 
@@ -82,7 +82,7 @@ export default function BuscarPorEnderecoPage() {
             {/* ERBs encontradas */}
             <div className="space-y-4 mt-4">
                 {sites.map((site, index) => (
-                    <SiteCardPro key={index} site={site} />
+                    <SiteCardPremium site={site} />
                 ))}
             </div>
         </main>

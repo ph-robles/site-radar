@@ -1,7 +1,7 @@
 "use client";
 
 import SearchInput from "@/components/SearchInput";
-import SiteCard from "@/components/SiteCard";
+import SiteCardPremium from "@/components/SiteCardPremium";
 import Loader from "@/components/Loader";
 import { useBuscarSite } from "@/hooks/useBuscarSite";
 
@@ -25,7 +25,7 @@ export default function BuscarPage() {
                 </p>
             )}
 
-            {site && <SiteCard site={site} />}
+            {site && <SiteCardPremium site={site} />}
         </main>
     );
 }

@@ -71,13 +71,26 @@ export default async function ErbDetalhesPage({ params }: any) {
             </div>
 
             {/* Ações */}
+
             <div className="flex gap-3 mt-4">
 
-                https://www.google.com/maps?q=${site.lat},${site.lon}
-                Ver no Mapa
-                <a>
+                <a
+                    href={`https://www.google.com/maps?q=${site.lat},${site.lon}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline font-semibold"
+                >
 
-                    https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}
+                    Ver no Mapa
+                </a>
+
+                <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-green-600 underline font-semibold"
+                >
+
                     Traçar rota
                 </a>
 
