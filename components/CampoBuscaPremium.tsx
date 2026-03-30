@@ -1,44 +1,36 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-export default function CampoBuscaPremium({
-    onBuscar,
-}: {
-    onBuscar: (valor: string) => void;
-}) {
+export default function CampoBuscaPremium({ onBuscar }: { onBuscar: (valor: string) => void }) {
     const [valor, setValor] = useState("");
-    const [debounced, setDebounced] = useState("");
 
-    // Debounce para suavizar busca
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            setDebounced(valor);
-        }, 500);
-        return () => clearTimeout(timeout);
-    }, [valor]);
+    // 🔥 Função de normalização: remove acentos, converte para minúsculas e tira espaços extras
+    function normalizarTexto(texto: string) {
+        return texto
+            .normalize("NFD")                     // separa acentos
+            .replace(/[\u0300-\u036f]/g, "")      // remove acentos
+            .toLowerCase()                        // deixa tudo minúsculo
+            .replace(/\s+/g, " ")                 // remove espaços duplicados
+            .trim();                              // remove espaços nas pontas
+    }
 
-    // Chama a busca após debounce
-    useEffect(() => {
-        if (debounced.trim() !== "") {
-            onBuscar(debounced.trim());
-        }
-    }, [debounced, onBuscar]);
+    function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const original = e.target.value;
+        const normalizado = normalizarTexto(original);
+
+        setValor(original);       // mantém o que o usuário digita
+        onBuscar(normalizado);    // envia a versão normalizada para a busca
+    }
 
     return (
-        <div className="w-full bg-white rounded-2xl shadow-lg border p-4 flex items-center gap-3 hover:shadow-xl transition">
-
-            {/* Ícone */}
-            <span className="text-[#7300E6] text-2xl">🔍</span>
-
-            {/* Input */}
+        <div className="w-full">
             <input
                 type="text"
+                placeholder="Digite nome, sigla ou endereço..."
                 value={valor}
-                onChange={(e) => setValor(e.target.value)}
-                placeholder="Digite a sigla da ERB (Ex: RJF001)"
-                className="flex-1 outline-none text-lg text-black placeholder-gray-400"
-                autoFocus
+                onChange={handleChange}
+                className="w-full p-3 rounded-xl border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
             />
         </div>
     );

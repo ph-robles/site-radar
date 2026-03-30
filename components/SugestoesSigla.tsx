@@ -1,66 +1,61 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { buscarSugestoesSigla } from "@/services/sites";
+interface Site {
+    sigla: string;
+    nome: string;
+    endereco: string;
+}
 
 export default function SugestoesSigla({
-    sigla,
-    onSelect,
+    termo,
+    lista,
+    onSelecionar,
 }: {
-    sigla: string;
-    onSelect: (valor: string) => void;
+    termo: string;
+    lista: Site[];
+    onSelecionar: (site: Site) => void;
 }) {
-    const [lista, setLista] = useState<any[]>([]);
-    const [loading, setLoading] = useState(false);
+    if (!termo.trim()) return null;
 
-    useEffect(() => {
-        async function buscar() {
-            if (sigla.length < 2) {
-                setLista([]);
-                return;
-            }
+    // 🔥 Função de normalização
+    function normalizarTexto(texto: string) {
+        return texto
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .replace(/\s+/g, " ")
+            .trim();
+    }
 
-            setLoading(true);
-            try {
-                const s = await buscarSugestoesSigla(sigla);
-                setLista(s);
-            } catch {
-                setLista([]);
-            }
-            setLoading(false);
-        }
+    const termoNormalizado = normalizarTexto(termo);
 
-        buscar();
-    }, [sigla]);
+    // Filtra usando sigla, nome e endereço normalizados
+    const resultados = lista.filter((site) => {
+        const siglaNorm = normalizarTexto(site.sigla);
+        const nomeNorm = normalizarTexto(site.nome);
+        const endNorm = normalizarTexto(site.endereco);
 
-    if (sigla.length < 2) return null;
+        return (
+            siglaNorm.includes(termoNormalizado) ||
+            nomeNorm.includes(termoNormalizado) ||
+            endNorm.includes(termoNormalizado)
+        );
+    });
+
+    if (resultados.length === 0) return null;
 
     return (
-        <div className="mt-3 bg-white rounded-xl shadow border divide-y">
-            {loading && (
-                <div className="p-3 text-gray-500 text-sm">Carregando...</div>
-            )}
-
-            {!loading && lista.length === 0 && (
-                <div className="p-3 text-gray-500 text-sm">
-                    Nenhuma ERB encontrada.
-                </div>
-            )}
-
-            {!loading &&
-                lista.map((item: any) => (
-                    <button
-                        key={item.id}
-                        onClick={() => onSelect(item.sigla)}
-                        className="w-full text-left p-3 hover:bg-[#A566FF22] transition flex items-center gap-2"
-                    >
-                        <span className="text-[#7300E6] text-lg">🔎</span>
-                        <span className="font-semibold text-[#4B0099]">
-                            {item.sigla}
-                        </span>
-                        <span className="text-gray-500 text-sm">{item.nome}</span>
-                    </button>
-                ))}
+        <div className="mt-2 bg-white border p-2 rounded-xl shadow-md">
+            {resultados.slice(0, 5).map((site, i) => (
+                <button
+                    key={i}
+                    onClick={() => onSelecionar(site)}
+                    className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg"
+                >
+                    <span className="font-semibold">{site.sigla}</span> —{" "}
+                    <span className="text-gray-600">{site.nome}</span>
+                </button>
+            ))}
         </div>
     );
 }
