@@ -1,6 +1,8 @@
-
 import { supabase } from "@/lib/supabase";
 import { getStatus } from "@/lib/status";
+import { useRouter } from "next/navigation";
+
+const router = useRouter();
 
 export default async function ErbDetalhesPage({ params }: any) {
     const id = Number(params.id);
@@ -32,23 +34,25 @@ export default async function ErbDetalhesPage({ params }: any) {
     return (
         <main className="p-4 space-y-6 max-w-xl mx-auto">
 
-            {/* BOTÃO VOLTAR */}
-            <button onClick={() => history.back()} className="bg-gray-200 px-4 py-2 rounded-xl shadow hover:bg-gray-300 transition" >
-
-
+            {/* Botão Voltar */}
+            <button
+                onClick={() => router.back()}
+                className="bg-gray-200 px-4 py-2 rounded-xl shadow hover:bg-gray-300 transition"
+            >
                 ⬅️ Voltar
             </button>
 
-            {/* CABEÇALHO */}
+            {/* Cabeçalho */}
             <div className="bg-[#7300E6] text-white p-6 rounded-2xl shadow-lg">
                 <h1 className="text-3xl font-extrabold">{site.sigla}</h1>
                 <p className="opacity-90">{site.nome}</p>
             </div>
 
-            {/* STATUS */}
+            {/* Status */}
             <div className="flex gap-4">
-                <span className={`px-4 py-1 rounded-full font-semibold bg-${status.color}-100 text-${status.color}-700`}>
-
+                <span
+                    className={`px-4 py-1 rounded-full font-semibold bg-${status.color}-100 text-${status.color}-700`}
+                >
                     {status.label}
                 </span>
 
@@ -59,7 +63,7 @@ export default async function ErbDetalhesPage({ params }: any) {
                 )}
             </div>
 
-            {/* INFORMAÇÕES */}
+            {/* Informações */}
             <div className="bg-white shadow-md rounded-2xl p-5 space-y-3 border">
                 <p><b>Endereço:</b> {site.endereco}</p>
                 <p><b>Detentora:</b> {site.detentora}</p>
@@ -67,14 +71,25 @@ export default async function ErbDetalhesPage({ params }: any) {
                 <p><b>Longitude:</b> {site.lon}</p>
             </div>
 
-            {/* AÇÕES */}
+            {/* Ações */}
             <div className="flex gap-3 mt-4">
-                <a>
 
-                    {`https://www.google.com/maps?q=${site.lat},${site.lon}`}
+                <a
+                    href={`https://www.google.com/maps?q=${site.lat},${site.lon}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-blue-600 text-white px-4 py-2 rounded-xl shadow hover:bg-blue-700 transition"
+                >
+                    Ver no Mapa
+                </a>
 
-                    {`https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}`}
-                    Traçar Rota
+                <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-green-600 text-white px-4 py-2 rounded-xl shadow hover:bg-green-700 transition"
+                >
+                    Traçar rota
                 </a>
 
             </div>
