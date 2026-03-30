@@ -103,17 +103,6 @@ export default function ErbDetalhesPage({ params }: any) {
                 )}
             </div>
 
-            {/* Informações da ERB */}
-            <div className="bg-white shadow-md rounded-2xl p-5 space-y-3 border">
-                <p><b>Endereço:</b> {site.endereco}</p>
-                <p><b>Detentora:</b> {site.detentora}</p>
-                <p><b>Latitude:</b> {site.lat}</p>
-                <p><b>Longitude:</b> {site.lon}</p>
-            </div>
-
-            {/* Botões Premium */}
-            <BotoesPremium lat={site.lat} lon={site.lon} />
-
             {/* Detalhes técnicos */}
             <div className="bg-white shadow-md rounded-2xl p-5 space-y-3 border text-black">
                 <h2 className="text-xl font-bold text-[#7300E6]">🔧 Detalhes Técnicos</h2>
@@ -144,6 +133,11 @@ export default function ErbDetalhesPage({ params }: any) {
                     </ul>
                 </div>
             </div>
+
+            {/* Botões Premium */}
+            <BotoesPremium lat={site.lat} lon={site.lon} />
+
+
 
 
 
