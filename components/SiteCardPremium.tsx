@@ -31,6 +31,25 @@ export default function SiteCardPremium({ site }: { site: any }) {
             <p className="text-gray-700 text-lg font-medium">{site.nome}</p>
             <p className="text-gray-500 text-sm">{site.endereco}</p>
 
+            {/* Acesso e Informações do Site */}
+            <div className="mt-3 text-black text-sm space-y-1">
+
+                <p>
+                    <b>Retirada da chave:</b> {site.retirada_chave || "N/A"}
+                </p>
+
+                <p>
+                    <b>Acesso:</b> {site.acesso || "N/A"}
+                </p>
+
+                <p>
+                    <b>Informação:</b> {site.informacao || "N/A"}
+                </p>
+
+            </div>
+
+
+
             {/* Vencimento Premium */}
             <div className="mt-3 text-black">
                 <p className="text-sm">
@@ -54,6 +73,8 @@ export default function SiteCardPremium({ site }: { site: any }) {
                     📏 {distanciaKm} km até você
                 </p>
             )}
+
+
 
             {/* Capacitada */}
             {site.capacitado === "SIM" && (
