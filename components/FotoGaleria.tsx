@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { supabase } from "@/lib/supabase";
 import {
     buscarFotosPorSigla,
     uploadFoto,
@@ -9,16 +10,34 @@ import {
     MAX_FOTOS,
 } from "@/services/fotos";
 
-/* Tipagem mínima para Touch */
+/* ───────── Tipagem mínima para Touch ───────── */
 type TouchPoint = {
     clientX: number;
     clientY: number;
 };
 
-export default function FotoGaleria({ sigla }: { sigla: string }) {
+const ADMIN_EMAIL = "raphael@seudominio.com";
+
+export default function FotoGaleria({
+    sigla,
+    endereco,
+}: {
+    sigla: string;
+    endereco: string;
+}) {
     const [fotos, setFotos] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
-    const [fotoAberta, setFotoAberta] = useState<string | null>(null);
+    const [fotoAberta, setFotoAberta] = useState<any | null>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    /* ───── Verifica admin ───── */
+    useEffect(() => {
+        supabase.auth.getUser().then(({ data }) => {
+            if (data.user?.email === ADMIN_EMAIL) {
+                setIsAdmin(true);
+            }
+        });
+    }, []);
 
     async function carregar() {
         const data = await buscarFotosPorSigla(sigla);
@@ -47,31 +66,53 @@ export default function FotoGaleria({ sigla }: { sigla: string }) {
     }
 
     async function handleDelete(id: string, path: string) {
+        if (!isAdmin) return;
         if (!confirm("Remover esta foto?")) return;
         await deletarFoto(id, path);
         await carregar();
+    }
+
+    function formatarData(data: string) {
+        return new Date(data).toLocaleString("pt-BR");
     }
 
     return (
         <div className="mt-4">
             <p className="font-semibold text-sm mb-2">📸 Fotos da ERB</p>
 
+            {/* GRID */}
             <div className="grid grid-cols-3 gap-2">
                 {fotos.map((f) => (
-                    <div key={f.id} className="relative group">
+                    <div
+                        key={f.id}
+                        className="relative rounded overflow-hidden cursor-pointer"
+                        onClick={() => setFotoAberta(f)}
+                    >
                         <img
                             src={f.url}
-                            alt="Foto da ERB"
-                            className="w-24 h-24 object-cover rounded cursor-pointer"
-                            onClick={() => setFotoAberta(f.url)}
+                            alt={`Foto ${sigla}`}
+                            className="w-24 h-24 object-cover"
                         />
 
-                        <button
-                            onClick={() => handleDelete(f.id, f.path)}
-                            className="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded hidden group-hover:block"
-                        >
-                            ✕
-                        </button>
+                        {/* OVERLAY */}
+                        <div className="absolute bottom-0 left-0 w-full bg-black/60 text-white text-[10px] p-1 backdrop-blur">
+                            <p className="font-bold">{sigla}</p>
+                            <p className="truncate">{endereco}</p>
+                            <p>📅 {formatarData(f.criado_em)}</p>
+                        </div>
+
+                        {/* DELETE (ADMIN) */}
+                        {isAdmin && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDelete(f.id, f.path);
+                                }}
+                                className="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded"
+                            >
+                                ✕
+                            </button>
+                        )}
                     </div>
                 ))}
 
@@ -92,20 +133,30 @@ export default function FotoGaleria({ sigla }: { sigla: string }) {
                 )}
             </div>
 
+            {/* MODAL */}
             {fotoAberta && (
-                <ZoomModal src={fotoAberta} onClose={() => setFotoAberta(null)} />
+                <ZoomModal
+                    foto={fotoAberta}
+                    sigla={sigla}
+                    endereco={endereco}
+                    onClose={() => setFotoAberta(null)}
+                />
             )}
         </div>
     );
 }
 
-/* ------------------------------ ZOOM MODAL ------------------------------ */
+/* ───────────────────── MODAL COM ZOOM + OVERLAY ───────────────────── */
 
 function ZoomModal({
-    src,
+    foto,
+    sigla,
+    endereco,
     onClose,
 }: {
-    src: string;
+    foto: any;
+    sigla: string;
+    endereco: string;
     onClose: () => void;
 }) {
     const [scale, setScale] = useState(1);
@@ -113,14 +164,15 @@ function ZoomModal({
 
     const lastTouch = useRef<TouchPoint | null>(null);
     const lastDistance = useRef<number | null>(null);
-    const dragging = useRef(false);
-    const lastMouse = useRef({ x: 0, y: 0 });
 
     function distance(t1: TouchPoint, t2: TouchPoint) {
         return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
     }
 
-    /* TOUCH (PINCH + PAN) */
+    function formatarData(data: string) {
+        return new Date(data).toLocaleString("pt-BR");
+    }
+
     function onTouchStart(e: React.TouchEvent) {
         if (e.touches.length === 2) {
             lastDistance.current = distance(e.touches[0], e.touches[1]);
@@ -138,44 +190,7 @@ function ZoomModal({
             const delta = d / lastDistance.current;
             setScale((s) => Math.min(Math.max(s * delta, 1), 4));
             lastDistance.current = d;
-        } else if (e.touches.length === 1 && scale > 1 && lastTouch.current) {
-            const dx = e.touches[0].clientX - lastTouch.current.clientX;
-            const dy = e.touches[0].clientY - lastTouch.current.clientY;
-            setPos((p) => ({ x: p.x + dx, y: p.y + dy }));
-            lastTouch.current = {
-                clientX: e.touches[0].clientX,
-                clientY: e.touches[0].clientY,
-            };
         }
-    }
-
-    function onTouchEnd() {
-        lastDistance.current = null;
-        lastTouch.current = null;
-    }
-
-    /* DESKTOP (SCROLL + PAN) */
-    function onWheelCapture(e: React.WheelEvent) {
-        e.preventDefault();
-        const delta = e.deltaY < 0 ? 1.15 : 0.87;
-        setScale((s) => Math.min(Math.max(s * delta, 1), 4));
-    }
-
-    function onMouseDown(e: React.MouseEvent) {
-        dragging.current = true;
-        lastMouse.current = { x: e.clientX, y: e.clientY };
-    }
-
-    function onMouseMove(e: React.MouseEvent) {
-        if (!dragging.current || scale <= 1) return;
-        const dx = e.clientX - lastMouse.current.x;
-        const dy = e.clientY - lastMouse.current.y;
-        setPos((p) => ({ x: p.x + dx, y: p.y + dy }));
-        lastMouse.current = { x: e.clientX, y: e.clientY };
-    }
-
-    function onMouseUp() {
-        dragging.current = false;
     }
 
     return (
@@ -183,36 +198,33 @@ function ZoomModal({
             className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center"
             onClick={onClose}
         >
+            <img
+                src={foto.url}
+                alt="Foto ampliada"
+                className="max-w-full max-h-full"
+                style={{
+                    transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`,
+                }}
+                onClick={(e) => e.stopPropagation()}
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                draggable={false}
+            />
+
+            {/* OVERLAY MODAL */}
+            <div className="absolute bottom-4 left-4 bg-black/70 text-white text-xs p-3 rounded backdrop-blur max-w-[90%]">
+                <p className="font-bold text-sm">{sigla}</p>
+                <p>{endereco}</p>
+                <p>📅 {formatarData(foto.criado_em)}</p>
+            </div>
+
             <button
-                className="absolute top-4 right-4 text-white text-2xl z-50"
+                className="absolute top-4 right-4 text-white text-2xl"
                 onClick={onClose}
             >
                 ✕
             </button>
-
-            <div
-                className="outline-none overscroll-contain"
-                tabIndex={0}
-                onWheelCapture={onWheelCapture}
-                onMouseDown={onMouseDown}
-                onMouseMove={onMouseMove}
-                onMouseUp={onMouseUp}
-                onTouchStart={onTouchStart}
-                onTouchMove={onTouchMove}
-                onTouchEnd={onTouchEnd}
-                onClick={(e) => e.stopPropagation()}
-            >
-                <img
-                    src={src}
-                    alt="Foto ampliada"
-                    draggable={false}
-                    className="max-w-full max-h-full select-none"
-                    style={{
-                        transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`,
-                        transition: dragging.current ? "none" : "transform 0.12s ease-out",
-                    }}
-                />
-            </div>
         </div>
     );
 }
+``

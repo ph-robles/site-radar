@@ -71,7 +71,7 @@ export default function SiteCardPremium({ site }: { site: any }) {
 
 
             {/* Galeria de Fotos */}
-            <FotoGaleria sigla={site.sigla} />
+            <FotoGaleria sigla={site.sigla} endereco={site.endereco} />
 
             {/* Distância */}
             {distanciaKm && (

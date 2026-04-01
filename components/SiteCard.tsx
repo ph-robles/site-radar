@@ -33,7 +33,7 @@ export default function SiteCard({ site }: any) {
             </div>
 
             {/* ── Galeria de fotos da ERB ── */}
-            <FotoGaleria sigla={site.sigla} />
+            <FotoGaleria sigla={site.sigla} endereco={site.endereco} />
 
         </div>
     )
