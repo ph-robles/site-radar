@@ -1,44 +1,40 @@
-import { getStatus } from "@/lib/status";
+import { getStatus } from "@/lib/status"
+import FotoGaleria from "@/components/FotoGaleria"
 
 export default function SiteCard({ site }: any) {
-    const status = getStatus(site.data_vencimento);
+    const status = getStatus(site.data_vencimento)
 
     return (
-        <div className="rounded-2xl shadow-md bg-white p-4 border border-gray-100 hover:shadow-lg transition">
-            <h2 className="text-xl font-bold text-gray-900">{site.sigla}</h2>
+        <div className="p-4 rounded-2xl shadow bg-white space-y-2">
 
-            <p className="text-gray-700">{site.nome}</p>
-            <p className="text-gray-500 text-sm">{site.endereco}</p>
+            <h2 className="text-xl font-bold">{site.sigla}</h2>
+            <p>{site.nome}</p>
 
-            <span
-                className={`mt-2 inline-block text-sm px-2 py-1 rounded-full bg-${status.color}-100 text-${status.color}-700`}
-            >
+            <span className={`text-${status.color}-500 font-semibold`}>
                 {status.label}
             </span>
 
-            {site.capacitado === "SIM" && (
-                <p className="mt-2 text-xs px-2 py-1 rounded-full inline-block bg-purple-100 text-purple-700 font-semibold">
-                    ⚡ ERB Capacitada
-                </p>
-            )}
-
-            <div className="flex gap-3 mt-4">
+            <div className="flex gap-2 mt-3">
                 <a
-                    href={`https://www.google.com/maps?q=${site.lat},${site.lon}`}
+                    href={`https://www.google.com/maps?q=${site.latitude},${site.longitude}`}
                     target="_blank"
-                    className="flex-1 text-center bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl"
+                    className="bg-blue-500 text-white px-3 py-1 rounded"
                 >
-                    Ver no Mapa
+                    Ver no mapa
                 </a>
 
                 <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${site.lat},${site.lon}`}
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${site.latitude},${site.longitude}`}
                     target="_blank"
-                    className="flex-1 text-center bg-green-600 hover:bg-green-700 text-white py-2 rounded-xl"
+                    className="bg-green-500 text-white px-3 py-1 rounded"
                 >
                     Rota
                 </a>
             </div>
+
+            {/* ── Galeria de fotos da ERB ── */}
+            <FotoGaleria sigla={site.sigla} />
+
         </div>
-    );
+    )
 }
