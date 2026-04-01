@@ -2,14 +2,22 @@ import { supabase } from "@/lib/supabase";
 
 // Buscar ERB pela sigla (para /buscar)
 export async function buscarSitePorSigla(sigla: string) {
+  const termo = sigla.trim().toUpperCase();
+
   const { data, error } = await supabase
     .from("sites")
     .select("*")
-    .ilike("sigla", sigla)
-    .single();
+    .ilike("sigla", termo)
+    .order("id", { ascending: false })
+    .limit(1);
 
   if (error) throw error;
-  return data;
+
+  if (!data || data.length === 0) {
+    throw new Error("ERB não encontrada");
+  }
+
+  return data[0];
 }
 
 // Buscar ERBs próximas (para /proximo e /endereco)
