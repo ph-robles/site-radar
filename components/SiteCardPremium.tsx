@@ -52,9 +52,12 @@ export default function SiteCardPremium({ site }: { site: any }) {
 
             {/* Vencimento Premium */}
             <div className="mt-3 text-black">
+
                 <p className="text-sm">
-                    <b>Vencimento:</b> {formatarData(site.data_vencimento)}
+                    <b>Vencimento:</b>{" "}
+                    {site.data_vencimento ? formatarData(site.data_vencimento) : "N/A"}
                 </p>
+
 
                 <span
                     className={`inline-block mt-1 text-xs font-bold px-3 py-1 rounded-full bg-${status.color}-100 text-${status.color}-700`}
