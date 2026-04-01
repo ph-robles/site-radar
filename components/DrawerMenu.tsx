@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -27,8 +26,8 @@ export default function DrawerMenu() {
 
             {/* Drawer */}
             <aside
-                className={`fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-[#7300E6] to-[#4B0099] 
-        shadow-2xl z-50 p-6 transition-transform duration-300 transform 
+                className={`fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-[#7300E6] to-[#4B0099]
+        shadow-2xl z-50 p-6 transition-transform duration-300 transform
         ${open ? "translate-x-0" : "-translate-x-full"}`}
             >
                 <h2 className="text-2xl font-bold text-white mb-8 tracking-wide">
@@ -36,7 +35,6 @@ export default function DrawerMenu() {
                 </h2>
 
                 <nav className="flex flex-col gap-4 text-lg text-white">
-
                     <Link
                         href="/"
                         onClick={() => setOpen(false)}
@@ -75,6 +73,15 @@ export default function DrawerMenu() {
                         className="flex items-center gap-3 font-semibold hover:bg-[#A566FF33] px-3 py-2 rounded-lg transition"
                     >
                         🗺️ Mapa
+                    </Link>
+
+                    {/* ✅ NOVO LINK SOBRE */}
+                    <Link
+                        href="/sobre"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center gap-3 font-semibold hover:bg-[#A566FF33] px-3 py-2 rounded-lg transition"
+                    >
+                        ℹ️ Sobre
                     </Link>
                 </nav>
 
