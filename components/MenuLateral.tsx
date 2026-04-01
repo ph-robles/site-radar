@@ -37,6 +37,10 @@ export default function MenuLateral() {
                     <Link href="/endereco" onClick={() => setOpen(false)}>🧭 Buscar por Endereço</Link>
                     <Link href="/proximo" onClick={() => setOpen(false)}>📍 Próximo a mim</Link>
                     <Link href="/mapa" onClick={() => setOpen(false)}>🗺️ Mapa</Link>
+                    <Link href="/mapa" onClick={() => setOpen(false)}>ℹ️ Sobre</Link>
+
+
+
                 </nav>
             </aside>
         </>
