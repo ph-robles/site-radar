@@ -10,7 +10,7 @@ import {
     MAX_FOTOS,
 } from "@/services/fotos";
 
-/* ───────── Tipagem mínima para Touch ───────── */
+/* Tipagem mínima */
 type TouchPoint = {
     clientX: number;
     clientY: number;
@@ -30,12 +30,10 @@ export default function FotoGaleria({
     const [fotoAberta, setFotoAberta] = useState<any | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
 
-    /* ───── Verifica admin ───── */
+    /* Verifica admin */
     useEffect(() => {
         supabase.auth.getUser().then(({ data }) => {
-            if (data.user?.email === ADMIN_EMAIL) {
-                setIsAdmin(true);
-            }
+            if (data.user?.email === ADMIN_EMAIL) setIsAdmin(true);
         });
     }, []);
 
@@ -58,8 +56,6 @@ export default function FotoGaleria({
             }
             await uploadFoto(sigla, file);
             await carregar();
-        } catch (e: any) {
-            alert(e.message);
         } finally {
             setLoading(false);
         }
@@ -88,20 +84,21 @@ export default function FotoGaleria({
                         className="relative rounded overflow-hidden cursor-pointer"
                         onClick={() => setFotoAberta(f)}
                     >
+                        {/* ✅ IMAGEM CORRETA */}
                         <img
                             src={f.url}
-                            alt={`Foto ${sigla}`}
-                            className="w-24 h-24 object-cover"
+                            alt={`Foto ERB ${sigla}`}
+                            className="w-full h-24 object-cover"
                         />
 
-                        {/* OVERLAY */}
+                        {/* ✅ OVERLAY */}
                         <div className="absolute bottom-0 left-0 w-full bg-black/60 text-white text-[10px] p-1 backdrop-blur">
                             <p className="font-bold">{sigla}</p>
                             <p className="truncate">{endereco}</p>
                             <p>📅 {formatarData(f.criado_em)}</p>
                         </div>
 
-                        {/* DELETE (ADMIN) */}
+                        {/* DELETE ADMIN */}
                         {isAdmin && (
                             <button
                                 onClick={(e) => {
@@ -146,7 +143,7 @@ export default function FotoGaleria({
     );
 }
 
-/* ───────────────────── MODAL COM ZOOM + OVERLAY ───────────────────── */
+/* ---------------- MODAL COM ZOOM + OVERLAY ---------------- */
 
 function ZoomModal({
     foto,
@@ -159,40 +156,6 @@ function ZoomModal({
     endereco: string;
     onClose: () => void;
 }) {
-    const [scale, setScale] = useState(1);
-    const [pos, setPos] = useState({ x: 0, y: 0 });
-
-    const lastTouch = useRef<TouchPoint | null>(null);
-    const lastDistance = useRef<number | null>(null);
-
-    function distance(t1: TouchPoint, t2: TouchPoint) {
-        return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
-    }
-
-    function formatarData(data: string) {
-        return new Date(data).toLocaleString("pt-BR");
-    }
-
-    function onTouchStart(e: React.TouchEvent) {
-        if (e.touches.length === 2) {
-            lastDistance.current = distance(e.touches[0], e.touches[1]);
-        } else if (e.touches.length === 1) {
-            lastTouch.current = {
-                clientX: e.touches[0].clientX,
-                clientY: e.touches[0].clientY,
-            };
-        }
-    }
-
-    function onTouchMove(e: React.TouchEvent) {
-        if (e.touches.length === 2 && lastDistance.current) {
-            const d = distance(e.touches[0], e.touches[1]);
-            const delta = d / lastDistance.current;
-            setScale((s) => Math.min(Math.max(s * delta, 1), 4));
-            lastDistance.current = d;
-        }
-    }
-
     return (
         <div
             className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center"
@@ -202,20 +165,13 @@ function ZoomModal({
                 src={foto.url}
                 alt="Foto ampliada"
                 className="max-w-full max-h-full"
-                style={{
-                    transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`,
-                }}
-                onClick={(e) => e.stopPropagation()}
-                onTouchStart={onTouchStart}
-                onTouchMove={onTouchMove}
-                draggable={false}
             />
 
-            {/* OVERLAY MODAL */}
+            {/* OVERLAY */}
             <div className="absolute bottom-4 left-4 bg-black/70 text-white text-xs p-3 rounded backdrop-blur max-w-[90%]">
                 <p className="font-bold text-sm">{sigla}</p>
                 <p>{endereco}</p>
-                <p>📅 {formatarData(foto.criado_em)}</p>
+                <p>📅 {new Date(foto.criado_em).toLocaleString("pt-BR")}</p>
             </div>
 
             <button
@@ -227,4 +183,3 @@ function ZoomModal({
         </div>
     );
 }
-``
