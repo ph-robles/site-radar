@@ -1,6 +1,7 @@
 
 import Link from "next/link";
 import { getStatusPremium, formatarData } from "@/lib/status";
+import FotoGaleria from "@/components/FotoGaleria";
 
 export default function SiteCardPremium({ site }: { site: any }) {
     const status = getStatusPremium(site.data_vencimento);
@@ -69,6 +70,8 @@ export default function SiteCardPremium({ site }: { site: any }) {
             </div>
 
 
+            {/* Galeria de Fotos */}
+            <FotoGaleria sigla={site.sigla} />
 
             {/* Distância */}
             {distanciaKm && (
