@@ -9,9 +9,7 @@ import {
     MAX_FOTOS,
 } from "@/services/fotos";
 
-/* ─────────────────────────────────────────────────────────── */
-/* Tipagem correta para Touch (React + DOM friendly)           */
-/* ─────────────────────────────────────────────────────────── */
+/* Tipagem mínima para Touch */
 type TouchPoint = {
     clientX: number;
     clientY: number;
@@ -58,7 +56,6 @@ export default function FotoGaleria({ sigla }: { sigla: string }) {
         <div className="mt-4">
             <p className="font-semibold text-sm mb-2">📸 Fotos da ERB</p>
 
-            {/* GRID */}
             <div className="grid grid-cols-3 gap-2">
                 {fotos.map((f) => (
                     <div key={f.id} className="relative group">
@@ -95,7 +92,6 @@ export default function FotoGaleria({ sigla }: { sigla: string }) {
                 )}
             </div>
 
-            {/* MODAL COM ZOOM */}
             {fotoAberta && (
                 <ZoomModal src={fotoAberta} onClose={() => setFotoAberta(null)} />
             )}
@@ -103,9 +99,8 @@ export default function FotoGaleria({ sigla }: { sigla: string }) {
     );
 }
 
-/* ─────────────────────────────────────────────────────────── */
-/* Modal com Zoom + Pinch + Pan                                */
-/* ─────────────────────────────────────────────────────────── */
+/* ------------------------------ ZOOM MODAL ------------------------------ */
+
 function ZoomModal({
     src,
     onClose,
@@ -125,7 +120,7 @@ function ZoomModal({
         return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
     }
 
-    /* ───────────── TOUCH (PINCH + PAN) ───────────── */
+    /* TOUCH (PINCH + PAN) */
     function onTouchStart(e: React.TouchEvent) {
         if (e.touches.length === 2) {
             lastDistance.current = distance(e.touches[0], e.touches[1]);
@@ -159,10 +154,10 @@ function ZoomModal({
         lastTouch.current = null;
     }
 
-    /* ───────────── MOUSE (DESKTOP) ───────────── */
-    function onWheel(e: React.WheelEvent) {
+    /* DESKTOP (SCROLL + PAN) */
+    function onWheelCapture(e: React.WheelEvent) {
         e.preventDefault();
-        const delta = e.deltaY < 0 ? 1.1 : 0.9;
+        const delta = e.deltaY < 0 ? 1.15 : 0.87;
         setScale((s) => Math.min(Math.max(s * delta, 1), 4));
     }
 
@@ -185,7 +180,7 @@ function ZoomModal({
 
     return (
         <div
-            className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center touch-none"
+            className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center"
             onClick={onClose}
         >
             <button
@@ -195,25 +190,29 @@ function ZoomModal({
                 ✕
             </button>
 
-            <img
-                src={src}
-                alt="Foto ampliada"
-                className="max-w-full max-h-full select-none"
-                style={{
-                    transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`,
-                    transition: dragging.current ? "none" : "transform 0.1s ease-out",
-                }}
-                onClick={(e) => e.stopPropagation()}
-                onTouchStart={onTouchStart}
-                onTouchMove={onTouchMove}
-                onTouchEnd={onTouchEnd}
-                onWheel={onWheel}
+            <div
+                className="outline-none overscroll-contain"
+                tabIndex={0}
+                onWheelCapture={onWheelCapture}
                 onMouseDown={onMouseDown}
                 onMouseMove={onMouseMove}
                 onMouseUp={onMouseUp}
-                draggable={false}
-            />
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <img
+                    src={src}
+                    alt="Foto ampliada"
+                    draggable={false}
+                    className="max-w-full max-h-full select-none"
+                    style={{
+                        transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`,
+                        transition: dragging.current ? "none" : "transform 0.12s ease-out",
+                    }}
+                />
+            </div>
         </div>
     );
 }
-``
