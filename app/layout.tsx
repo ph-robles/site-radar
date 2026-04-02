@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Site Radar",
     description:
-      "Ferramenta para localizar ERBs, consultar acessos, vencimentos e registros fotográficos.",
+      "Ferramenta para localizar Sites/ERBs, consultar acessos, vencimentos e registros fotográficos.",
     url: "https://site-radar.vercel.app",
     siteName: "Site Radar",
     images: [
