@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES6",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -17,21 +13,17 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    /* ✅ silencia warning do TS 6.x */
-    "ignoreDeprecations": "6.0",
-    /* ✅ alias do Next.js */
+
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     },
+
     "plugins": [
-      {
-        "name": "next"
-      }
+      { "name": "next" }
     ]
   },
+
   "include": [
     "next-env.d.ts",
     "**/*.ts",
@@ -40,7 +32,6 @@
     "global.d.ts",
     ".next/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+
+  "exclude": ["node_modules"]
 }
