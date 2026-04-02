@@ -17,7 +17,9 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    /* AQUI ESTÁ O ALIAS — ESSENCIAL */
+    /* ✅ silencia warning do TS 6.x */
+    "ignoreDeprecations": "6.0",
+    /* ✅ alias do Next.js */
     "baseUrl": ".",
     "paths": {
       "@/*": [
@@ -35,6 +37,7 @@
     "**/*.ts",
     "**/*.tsx",
     "next.config.js",
+    "global.d.ts",
     ".next/types/**/*.ts"
   ],
   "exclude": [

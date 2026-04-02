@@ -1,4 +1,3 @@
-
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -8,7 +7,38 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Site Radar",
-  description: "Controle de vencimento de ERBs",
+  description: "Busca de Sites/ERBs - B2B",
+
+  openGraph: {
+    title: "Site Radar",
+    description:
+      "Ferramenta para localizar ERBs, consultar acessos, vencimentos e registros fotográficos.",
+    url: "https://site-radar.vercel.app",
+    siteName: "Site Radar",
+    images: [
+      {
+        url: "https://site-radar.vercel.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Site Radar - Localização de ERBs",
+      },
+    ],
+    locale: "pt_BR",
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Site Radar",
+    description:
+      "Busca e visualização de ERBs com informações técnicas e fotos.",
+    images: ["https://site-radar.vercel.app/og-image.png"],
+  },
+
+  icons: {
+    icon: "/icon.png",
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -19,6 +49,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
+        {/* Leaflet */}
         <link
           rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
