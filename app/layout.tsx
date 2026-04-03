@@ -12,11 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Site Radar",
     description:
-<<<<<<< HEAD
-      "Ferramenta para localizar Sites/ERBs, consultar acessos e registros fotográficos.",
-=======
       "Ferramenta para localizar ERBs, consultar acessos, vencimentos e registros fotográficos.",
->>>>>>> 714787b63f487eb23c33a5082f6d6704d1dbc422
     url: "https://site-radar.vercel.app",
     siteName: "Site Radar",
     images: [
@@ -35,7 +31,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Site Radar",
     description:
-      "Busca e visualização de ERBs com informações técnicas e fotos.",
+      "Ferramenta para localizar ERBs, consultar acessos, vencimentos e registros fotográficos.",
     images: ["https://site-radar.vercel.app/og-image.png"],
   },
 
@@ -53,11 +49,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
-        {/* Leaflet */}
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        />
+        https://unpkg.com/leaflet@1.9.4/dist/leaflet.css
       </head>
 
       <body className={inter.className}>

@@ -12,7 +12,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+<<<<<<< HEAD
     "incremental": true; 
+=======
+    "incremental": true,
+>>>>>>> aff28af41c80b6e2906941080260b0f4d6c670a8
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
