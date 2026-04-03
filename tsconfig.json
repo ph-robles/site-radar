@@ -13,13 +13,6 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-<<<<<<< HEAD
-    /* ⚠️ NÃO COLOQUE ignoreDeprecations AQUI */
-=======
-
-    /* ⚠️ NÃO COLOQUE ignoreDeprecations AQUI */
-
->>>>>>> 714787b63f487eb23c33a5082f6d6704d1dbc422
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
