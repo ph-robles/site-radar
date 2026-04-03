@@ -8,18 +8,21 @@ import L from "leaflet";
 export default function KmlLayer() {
     const map = useMap();
     const layerRef = useRef<L.Layer | null>(null);
+    const mountedRef = useRef(true);
 
     useEffect(() => {
+        mountedRef.current = true;
+
         if (!map) return;
 
         const layer = omnivore.kml("/doc.kml");
 
         layer.on("ready", () => {
+            if (!mountedRef.current) return;
             if (!map) return;
 
             layer.addTo(map);
 
-            // Proteção: só ajusta zoom se houver bounds válidos
             if (layer.getBounds && layer.getBounds().isValid()) {
                 map.fitBounds(layer.getBounds());
             }
@@ -32,13 +35,14 @@ export default function KmlLayer() {
         layerRef.current = layer;
 
         return () => {
-            // ✅ Cleanup seguro (evita removeChild null)
+            mountedRef.current = false;
+
             try {
                 if (layerRef.current && map.hasLayer(layerRef.current)) {
                     map.removeLayer(layerRef.current);
                 }
             } catch {
-                // ignora erro interno do Leaflet
+                // ✅ ignora bug interno do Leaflet
             }
         };
     }, [map]);

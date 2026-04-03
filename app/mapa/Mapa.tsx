@@ -2,7 +2,7 @@
 
 import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import "../leaflet-icons";
+import "./leaflet-icons";
 import KmlLayer from "./KmlLayer";
 
 export default function Mapa() {
@@ -17,7 +17,6 @@ export default function Mapa() {
                 attribution="&copy; OpenStreetMap contributors"
             />
 
-            {/* ✅ Camada KML */}
             <KmlLayer />
         </MapContainer>
     );

@@ -1,6 +1,5 @@
 import L from "leaflet";
 
-// Corrige o caminho dos ícones padrão do Leaflet no Next.js
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 
 L.Icon.Default.mergeOptions({
