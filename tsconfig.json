@@ -17,9 +17,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    /* ✅ silencia warning do TS 6.x */
-    "ignoreDeprecations": "6.0",
-    /* ✅ alias do Next.js */
+    /* ⚠️ NÃO COLOQUE ignoreDeprecations AQUI */
     "baseUrl": ".",
     "paths": {
       "@/*": [
@@ -36,8 +34,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "next.config.js",
     "global.d.ts",
+    "next.config.js",
     ".next/types/**/*.ts"
   ],
   "exclude": [
