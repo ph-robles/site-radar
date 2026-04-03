@@ -1,15 +1,16 @@
 "use client";
 
-// 🔥 ISSO É O QUE RESOLVE O ERRO DA VERCEL
-export const dynamic = "force-dynamic";
+import dynamic from "next/dynamic";
 
-import MapaLeaflet from "./MapaLeaflet";
+const MapaLeaflet = dynamic(() => import("./MapaLeaflet"), {
+    ssr: false,
+    loading: () => <p>Carregando mapa...</p>,
+});
 
-export default function MapaPage() {
+export default function Page() {
     return (
-        <>
+        <main style={{ width: "100%", height: "100vh" }}>
             <MapaLeaflet />
-            <div id="map" style={{ height: "100vh", width: "100%" }} />
-        </>
+        </main>
     );
 }

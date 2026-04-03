@@ -3,50 +3,40 @@
 import { useEffect } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import "./leaflet-icons";
-import { kml } from "@mapbox/togeojson";
+import { defaultIcon } from "./leaflet-icons";
+import KmlLayer from "./KmlLayer";
 
 export default function MapaLeaflet() {
     useEffect(() => {
-        const container = document.getElementById("map");
+        if (typeof window === "undefined") return;
 
-        // evita criar 2 mapas no mesmo elemento
-        if (!container || (container as any)._leaflet_id) return;
+        // Evita recriar o mapa
+        const mapContainer = document.getElementById("map");
+        if (!mapContainer || mapContainer.children.length > 0) return;
 
-        // cria o mapa
-        const map = L.map(container).setView([-22.9, -43.2], 12);
+        // Criar mapa
+        const map = L.map("map").setView([-22.90, -43.17], 11);
 
+        // Camada base
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: "&copy; OpenStreetMap contributors",
+            maxZoom: 19,
         }).addTo(map);
 
-        // carrega o KML
-        fetch("/doc.kml")
-            .then((res) => res.text())
-            .then((text) => {
-                const xml = new DOMParser().parseFromString(text, "text/xml");
-                const geojson = kml(xml);
+        // Definir ícone
+        L.Marker.prototype.options.icon = defaultIcon;
 
-                const layer = L.geoJSON(geojson, {
-                    style: {
-                        color: "#7300E6",
-                        weight: 2,
-                        fillOpacity: 0.3,
-                    },
-                }).addTo(map);
+        // ✅ CARREGAR ARQUIVO KML (se existir)
+        KmlLayer("\kml\doc.kml", map);
 
-                const bounds = layer.getBounds();
-                if (bounds.isValid()) {
-                    map.fitBounds(bounds);
-                }
-            })
-            .catch((err) => console.error("Erro ao carregar KML:", err));
-
-        // ✅ CLEANUP CORRETO — NÃO RETORNA NADA
-        return () => {
-            map.remove(); // remove o mapa sem retornar nada
-        };
     }, []);
 
-    return null;
+    return (
+        <div
+            id="map"
+            style={{
+                width: "100%",
+                height: "100vh",
+            }}
+        />
+    );
 }
