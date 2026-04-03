@@ -52,7 +52,7 @@ export default function RootLayout({
           </h1>
         </header>
 
-        {/* <DrawerMenu /> */}
+        <DrawerMenu />
         <main className="p-4 max-w-3xl mx-auto bg-gray-100 min-h-screen">
           {children}
         </main>
