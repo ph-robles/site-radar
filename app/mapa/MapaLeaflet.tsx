@@ -8,40 +8,46 @@ import KmlLayer from "./KmlLayer";
 
 export default function MapaLeaflet() {
     const mapRef = useRef<L.Map | null>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        // garantir client
         if (typeof window === "undefined") return;
+        if (!containerRef.current) return;
 
-        // Se o mapa já foi criado, não recriar
+        // Se já existe um mapa, não recriar
         if (mapRef.current) return;
 
-        const map = L.map("map", {
+        const map = L.map(containerRef.current, {
             zoomControl: true,
             preferCanvas: true,
         }).setView([-22.90, -43.17], 11);
 
         mapRef.current = map;
 
-        // camada base
+        // Camada base
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
             maxZoom: 19,
         }).addTo(map);
 
-        // ícone padrão
+        // Ícone padrão
         L.Marker.prototype.options.icon = defaultIcon;
 
-        // carregar KML
+        // Carregar KML
         KmlLayer("/kml/arquivo.kml", map);
+
+        // ── CLEANUP: destrói o mapa ao desmontar o componente ──
+        return () => {
+            if (mapRef.current) {
+                mapRef.current.remove();
+                mapRef.current = null;
+            }
+        };
     }, []);
 
     return (
         <div
-            id="map"
-            style={{
-                width: "100%",
-                height: "100vh",
-            }}
+            ref={containerRef}
+            style={{ width: "100%", height: "100vh" }}
         />
     );
 }
