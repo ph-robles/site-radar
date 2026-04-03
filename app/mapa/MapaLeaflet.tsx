@@ -8,8 +8,8 @@ import { kml } from "@mapbox/togeojson";
 
 export default function MapaLeaflet() {
     useEffect(() => {
-        // 🔒 Garante que o mapa só é criado uma vez
         const container = document.getElementById("map");
+
         if (!container || (container as any)._leaflet_id) return;
 
         const map = L.map(container).setView([-22.9, -43.2], 12);
@@ -18,12 +18,10 @@ export default function MapaLeaflet() {
             attribution: "&copy; OpenStreetMap contributors",
         }).addTo(map);
 
-        // ✅ Carregar KML de forma segura
         fetch("/doc.kml")
             .then((res) => res.text())
             .then((text) => {
-                const parser = new DOMParser();
-                const xml = parser.parseFromString(text, "text/xml");
+                const xml = new DOMParser().parseFromString(text, "text/xml");
                 const geojson = kml(xml);
 
                 const layer = L.geoJSON(geojson, {
@@ -39,14 +37,9 @@ export default function MapaLeaflet() {
                     map.fitBounds(bounds);
                 }
             })
-            .catch((err) => {
-                console.error("Erro ao carregar KML:", err);
-            });
+            .catch((err) => console.error("Erro ao carregar KML:", err));
 
-        // ✅ Cleanup SEGURO
-        return () => {
-            map.remove();
-        };
+        return () => map.remove();
     }, []);
 
     return null;

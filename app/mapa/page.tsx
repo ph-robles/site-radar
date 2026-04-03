@@ -1,3 +1,5 @@
+"use client";
+
 import MapaLeaflet from "./MapaLeaflet";
 
 export default function MapaPage() {
