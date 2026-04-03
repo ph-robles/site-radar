@@ -1,9 +1,10 @@
-import dynamic from "next/dynamic";
-
-const Mapa = dynamic(() => import("./Mapa"), {
-    ssr: false,
-});
+import MapaLeaflet from "./MapaLeaflet";
 
 export default function MapaPage() {
-    return <Mapa />;
+    return (
+        <>
+            <MapaLeaflet />
+            <div id="map" style={{ height: "100vh", width: "100%" }} />
+        </>
+    );
 }
