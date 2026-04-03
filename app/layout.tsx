@@ -8,7 +8,6 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Site Radar",
   description: "Busca de Sites/ERBs - B2B",
-
   openGraph: {
     title: "Site Radar",
     description:
@@ -26,7 +25,6 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     type: "website",
   },
-
   twitter: {
     card: "summary_large_image",
     title: "Site Radar",
@@ -34,7 +32,6 @@ export const metadata: Metadata = {
       "Ferramenta para localizar ERBs, consultar acessos, vencimentos e registros fotográficos.",
     images: ["https://site-radar.vercel.app/og-image.png"],
   },
-
   icons: {
     icon: "/icon.png",
     apple: "/apple-icon.png",
@@ -48,17 +45,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <head>
-        https://unpkg.com/leaflet@1.9.4/dist/leaflet.css
-      </head>
-
       <body className={inter.className}>
         <header className="w-full bg-[#7300E6] text-white p-4 shadow-md relative">
-          <h1 className="text-xl font-bold text-center">📡 Site Radar</h1>
+          <h1 className="text-xl font-bold text-center">
+            📡 Site Radar
+          </h1>
         </header>
 
-        <DrawerMenu />
-
+        {/* <DrawerMenu /> */}
         <main className="p-4 max-w-3xl mx-auto bg-gray-100 min-h-screen">
           {children}
         </main>
