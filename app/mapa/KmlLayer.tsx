@@ -1,48 +1,55 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useMap } from "react-leaflet";
-import omnivore from "@mapbox/leaflet-omnivore";
 import L from "leaflet";
+import { kml } from "@mapbox/togeojson";
 
 export default function KmlLayer() {
     const map = useMap();
-    const layerRef = useRef<L.Layer | null>(null);
-    const mountedRef = useRef(true);
 
     useEffect(() => {
-        mountedRef.current = true;
+        let layer: L.GeoJSON | null = null;
+        let aborted = false;
 
-        if (!map) return;
+        async function loadKml() {
+            try {
+                const res = await fetch("/doc.kml");
+                if (!res.ok) return;
 
-        const layer = omnivore.kml("/doc.kml");
+                const text = await res.text();
+                if (aborted) return;
 
-        layer.on("ready", () => {
-            if (!mountedRef.current) return;
-            if (!map) return;
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(text, "text/xml");
 
-            layer.addTo(map);
+                const geojson = kml(xml);
 
-            if (layer.getBounds && layer.getBounds().isValid()) {
-                map.fitBounds(layer.getBounds());
+                layer = L.geoJSON(geojson, {
+                    style: {
+                        color: "#7300E6",
+                        weight: 2,
+                        fillOpacity: 0.25,
+                    },
+                });
+
+                layer.addTo(map);
+
+                const bounds = layer.getBounds();
+                if (bounds.isValid()) {
+                    map.fitBounds(bounds);
+                }
+            } catch (err) {
+                console.error("Erro ao carregar KML:", err);
             }
-        });
+        }
 
-        layer.on("error", (e: unknown) => {
-            console.error("Erro ao carregar KML:", e);
-        });
-
-        layerRef.current = layer;
+        loadKml();
 
         return () => {
-            mountedRef.current = false;
-
-            try {
-                if (layerRef.current && map.hasLayer(layerRef.current)) {
-                    map.removeLayer(layerRef.current);
-                }
-            } catch {
-                // ✅ ignora bug interno do Leaflet
+            aborted = true;
+            if (layer) {
+                map.removeLayer(layer);
             }
         };
     }, [map]);
