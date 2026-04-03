@@ -10,14 +10,17 @@ export default function MapaLeaflet() {
     useEffect(() => {
         const container = document.getElementById("map");
 
+        // evita criar 2 mapas no mesmo elemento
         if (!container || (container as any)._leaflet_id) return;
 
+        // cria o mapa
         const map = L.map(container).setView([-22.9, -43.2], 12);
 
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
             attribution: "&copy; OpenStreetMap contributors",
         }).addTo(map);
 
+        // carrega o KML
         fetch("/doc.kml")
             .then((res) => res.text())
             .then((text) => {
@@ -39,7 +42,10 @@ export default function MapaLeaflet() {
             })
             .catch((err) => console.error("Erro ao carregar KML:", err));
 
-        return () => map.remove();
+        // ✅ CLEANUP CORRETO — NÃO RETORNA NADA
+        return () => {
+            map.remove(); // remove o mapa sem retornar nada
+        };
     }, []);
 
     return null;
