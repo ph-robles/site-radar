@@ -13,6 +13,10 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3808c739e3ff6334d08efddf4e2b168e6641f6f7
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
