@@ -1,10 +1,27 @@
+/* ── Leaflet CSS (deve vir antes do Tailwind para não conflitar) ── */
+@import 'leaflet/dist/leaflet.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ── Variáveis globais ─────────────────────────────────────────── */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  --primary: #0084ff;
+  --primary-hover: #006ddb;
+  --primary-active: #005bb8;
+  --shadow: 0px 3px 10px rgba(0, 132, 255, 0.30);
+  --shadow-hover: 0px 5px 18px rgba(0, 132, 255, 0.45);
+
+  --vivo-primary: #7300E6;
+  --vivo-primary-dark: #4B0099;
+  --vivo-secondary: #A566FF;
+  --vivo-gray: #4D4D4D;
+  --vivo-light: #F2F2F2;
+  --radius: 18px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -14,21 +31,38 @@
   }
 }
 
+/* ── Base ──────────────────────────────────────────────────────── */
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-/* Botões */
-:root {
-  --primary: #0084ff;
-  --primary-hover: #006ddb;
-  --primary-active: #005bb8;
-  --shadow: 0px 3px 10px rgba(0, 132, 255, 0.30);
-  --shadow-hover: 0px 5px 18px rgba(0, 132, 255, 0.45);
+/* ── Mapa Leaflet ──────────────────────────────────────────────── */
+/* 
+  NÃO definir height aqui — o height é controlado pelo componente (100vh).
+  Só garantir que o container ocupe o espaço disponível corretamente.
+*/
+.leaflet-container {
+  width: 100%;
+  height: 100%;
 }
 
+/* Corrige z-index dos controles do Leaflet no Next.js */
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 800 !important;
+}
+
+.leaflet-pane {
+  z-index: 400 !important;
+}
+
+.leaflet-popup {
+  z-index: 900 !important;
+}
+
+/* ── Botões ────────────────────────────────────────────────────── */
 .btn {
   background: var(--primary);
   color: #fff;
@@ -54,7 +88,22 @@ body {
   background: var(--primary-active);
 }
 
-/* Chips */
+.btn-vivo {
+  background: var(--vivo-primary);
+  color: white;
+  padding: 14px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-radius: var(--radius);
+  width: 100%;
+  transition: 0.2s ease-in-out;
+}
+
+.btn-vivo:hover {
+  background: var(--vivo-primary-dark);
+}
+
+/* ── Chips ─────────────────────────────────────────────────────── */
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -76,36 +125,4 @@ body {
   background: rgba(49, 51, 63, 0.08);
   border-color: rgba(49, 51, 63, 0.4);
   transform: translateY(-1px);
-}
-
-.leaflet-container {
-  height: 500px;
-  width: 100%;
-  border-radius: 14px;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
-}
-
-
-:root {
-  --vivo-primary: #7300E6;
-  --vivo-primary-dark: #4B0099;
-  --vivo-secondary: #A566FF;
-  --vivo-gray: #4D4D4D;
-  --vivo-light: #F2F2F2;
-  --radius: 18px;
-}
-
-.btn-vivo {
-  background: var(--vivo-primary);
-  color: white;
-  padding: 14px;
-  font-weight: 600;
-  font-size: 1.1rem;
-  border-radius: var(--radius);
-  width: 100%;
-  transition: 0.2s ease-in-out;
-}
-
-.btn-vivo:hover {
-  background: var(--vivo-primary-dark);
 }
