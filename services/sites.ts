@@ -42,3 +42,15 @@ export async function buscarSugestoesSigla(parcial: string) {
   if (error) throw error;
   return data;
 }
+
+// Buscar todos os sites com coordenadas (para o mapa)
+export async function buscarTodosSitesParaMapa() {
+  const { data, error } = await supabase
+    .from("sites")
+    .select("id, sigla, endereco, lat, lon, capacitado")
+    .not("lat", "is", null)
+    .not("lon", "is", null);
+
+  if (error) throw error;
+  return data ?? [];
+}
