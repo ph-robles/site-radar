@@ -12,7 +12,7 @@ export default function HomePage() {
       <div className="bg-[#7300E6] text-white p-6 rounded-2xl shadow-lg mb-8">
         <h1 className="text-3xl font-extrabold tracking-tight">📡 Site Radar</h1>
         <p className="opacity-95 text-sm mt-1">
-          Consulte ERBs, rotas, mapas e detalhes técnicos dos sites.
+          Consulte Sites/ERBs, rotas, mapas e detalhes técnicos dos sites.
         </p>
       </div>
 
@@ -63,7 +63,7 @@ export default function HomePage() {
         >
           <span className="text-4xl">🗺️</span>
           <p className="font-semibold text-[#7300E6] text-center text-lg">
-            Mapa Geral
+            Mapa dos Capacitados
           </p>
         </button>
       </div>
