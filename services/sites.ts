@@ -1,23 +1,73 @@
 import { supabase } from "@/lib/supabase";
 
-// Buscar ERB pela sigla (para /buscar)
-export async function buscarSitePorSigla(sigla: string) {
-  const termo = sigla.trim().toUpperCase();
+// ── Limpa o input do usuário gerando variações para busca ─────────────────────
+// Exemplos que funcionam:
+//   "RJDJU"   → tenta "RJDJU", depois "DJU"
+//   "RJ DJU"  → tenta "RJ DJU", depois "DJU"
+//   "rj dju"  → normaliza para "DJU"
+//   "RJarc"   → tenta "RJARC", depois "ARC"
+//   "DJU"     → tenta direto "DJU"
 
-  const { data, error } = await supabase
-    .from("sites")
-    .select("*")
-    .ilike("sigla", termo)
-    .order("id", { ascending: false })
-    .limit(1);
+const PREFIXOS_ESTADO = [
+  "RJ", "SP", "MG", "ES", "BA", "PR", "SC", "RS",
+  "GO", "MT", "MS", "PA", "AM", "CE", "PE", "MA",
+  "PI", "RN", "PB", "AL", "SE", "TO", "AC", "RO",
+  "RR", "AP", "DF",
+];
 
-  if (error) throw error;
+function gerarVariacoes(input: string): string[] {
+  const limpo = input.trim().toUpperCase().replace(/\s+/g, "");
+  const variacoes: string[] = [];
 
-  if (!data || data.length === 0) {
-    throw new Error("ERB não encontrada");
+  // 1. Termo exato normalizado
+  variacoes.push(limpo);
+
+  // 2. Remove prefixo de estado se encontrado no início
+  for (const prefix of PREFIXOS_ESTADO) {
+    if (limpo.startsWith(prefix) && limpo.length > prefix.length) {
+      const semPrefixo = limpo.slice(prefix.length);
+      variacoes.push(semPrefixo);
+      break;
+    }
   }
 
-  return data[0];
+  // 3. Versão com espaço original (ex: "RJ DJU" → "DJU")
+  const comEspaco = input.trim().toUpperCase();
+  if (comEspaco !== limpo) {
+    variacoes.push(comEspaco);
+    const partes = comEspaco.split(/\s+/);
+    if (partes.length >= 2) {
+      // última palavra (provavelmente a sigla real)
+      variacoes.push(partes[partes.length - 1]);
+      // segunda parte em diante
+      variacoes.push(partes.slice(1).join(""));
+    }
+  }
+
+  // Remove duplicatas mantendo ordem
+  return [...new Set(variacoes)];
+}
+
+// Buscar ERB pela sigla (para /buscar) — tenta múltiplas variações
+export async function buscarSitePorSigla(sigla: string) {
+  const variacoes = gerarVariacoes(sigla);
+
+  for (const termo of variacoes) {
+    const { data, error } = await supabase
+      .from("sites")
+      .select("*")
+      .ilike("sigla", termo)
+      .order("id", { ascending: false })
+      .limit(1);
+
+    if (error) throw error;
+
+    if (data && data.length > 0) {
+      return data[0];
+    }
+  }
+
+  throw new Error("ERB não encontrada");
 }
 
 // Buscar ERBs próximas (para /proximo e /endereco)
@@ -33,10 +83,13 @@ export async function buscarSitesProximos(lat: number, lon: number) {
 
 // Sugestões de sigla (para autocomplete)
 export async function buscarSugestoesSigla(parcial: string) {
+  const variacoes = gerarVariacoes(parcial);
+  const termoBusca = variacoes[variacoes.length - 1]; // usa a variação mais limpa
+
   const { data, error } = await supabase
     .from("sites")
     .select("id, sigla, nome")
-    .ilike("sigla", `${parcial}%`)
+    .ilike("sigla", `${termoBusca}%`)
     .limit(5);
 
   if (error) throw error;
