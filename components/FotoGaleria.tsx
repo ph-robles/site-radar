@@ -1,15 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/lib/supabase";
 import {
     buscarFotosPorSigla,
     uploadFoto,
     deletarFoto,
     MAX_FOTOS,
 } from "@/services/fotos";
-
-const ADMIN_EMAIL = "raphaelrobles22@hotmail.com";
 
 export default function FotoGaleria({
     sigla,
@@ -22,7 +19,10 @@ export default function FotoGaleria({
     const [fotoAberta, setFotoAberta] = useState<any | null>(null);
     const [uploading, setUploading] = useState(false);
     const [erro, setErro] = useState("");
-    const inputRef = useRef<HTMLInputElement>(null);
+
+    // Dois inputs: um para câmera, outro para galeria
+    const inputCameraRef = useRef<HTMLInputElement>(null);
+    const inputGaleriaRef = useRef<HTMLInputElement>(null);
 
     async function carregar() {
         const data = await buscarFotosPorSigla(sigla);
@@ -57,7 +57,8 @@ export default function FotoGaleria({
             setErro(err.message ?? "Erro ao enviar foto.");
         } finally {
             setUploading(false);
-            if (inputRef.current) inputRef.current.value = "";
+            if (inputCameraRef.current) inputCameraRef.current.value = "";
+            if (inputGaleriaRef.current) inputGaleriaRef.current.value = "";
         }
     }
 
@@ -70,27 +71,57 @@ export default function FotoGaleria({
                 <p className="font-semibold text-sm">
                     📸 Fotos ({fotos.length}/{MAX_FOTOS})
                 </p>
+
+                {/* Dois botões lado a lado */}
                 {podeAdicionar && (
-                    <button
-                        type="button"
-                        onClick={() => inputRef.current?.click()}
-                        disabled={uploading}
-                        className="bg-[#7300E6] hover:bg-[#4B0099] text-white text-xs font-semibold
-                            px-3 py-1.5 rounded-lg transition disabled:opacity-50"
-                    >
-                        {uploading ? "Enviando..." : "📷 Adicionar foto"}
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            type="button"
+                            onClick={() => inputCameraRef.current?.click()}
+                            disabled={uploading}
+                            className="bg-[#7300E6] hover:bg-[#4B0099] text-white text-xs font-semibold
+                                px-3 py-1.5 rounded-lg transition disabled:opacity-50"
+                        >
+                            📷 Câmera
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => inputGaleriaRef.current?.click()}
+                            disabled={uploading}
+                            className="bg-gray-500 hover:bg-gray-600 text-white text-xs font-semibold
+                                px-3 py-1.5 rounded-lg transition disabled:opacity-50"
+                        >
+                            🖼️ Galeria
+                        </button>
+                    </div>
                 )}
             </div>
 
-            {/* Input oculto — abre câmera ou galeria no celular */}
+            {/* Input câmera — abre câmera traseira */}
             <input
-                ref={inputRef}
+                ref={inputCameraRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleFileChange}
+                className="hidden"
+            />
+
+            {/* Input galeria — abre seletor de arquivos */}
+            <input
+                ref={inputGaleriaRef}
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
                 className="hidden"
             />
+
+            {/* Enviando... */}
+            {uploading && (
+                <p className="text-[#7300E6] text-xs text-center py-2 animate-pulse">
+                    Enviando foto...
+                </p>
+            )}
 
             {/* Erro */}
             {erro && (
@@ -99,16 +130,13 @@ export default function FotoGaleria({
                 </p>
             )}
 
-            {/* Estado vazio — área clicável */}
+            {/* Estado vazio */}
             {fotos.length === 0 && !uploading && (
-                <div
-                    onClick={() => podeAdicionar && inputRef.current?.click()}
-                    className="border-2 border-dashed border-gray-300 rounded-xl py-6 text-center
-                        text-gray-400 text-sm cursor-pointer hover:border-[#7300E6]
-                        hover:text-[#7300E6] transition"
-                >
+                <div className="border-2 border-dashed border-gray-300 rounded-xl py-6 text-center
+                    text-gray-400 text-sm">
                     <p className="text-2xl mb-1">📷</p>
-                    <p>Toque para adicionar a primeira foto</p>
+                    <p>Nenhuma foto cadastrada</p>
+                    <p className="text-xs mt-1">Use os botões acima para adicionar</p>
                 </div>
             )}
 
@@ -148,7 +176,7 @@ export default function FotoGaleria({
                     {podeAdicionar && (
                         <button
                             type="button"
-                            onClick={() => inputRef.current?.click()}
+                            onClick={() => inputCameraRef.current?.click()}
                             disabled={uploading}
                             className="h-24 rounded-xl border-2 border-dashed border-gray-300
                                 flex flex-col items-center justify-center text-gray-400
