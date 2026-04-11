@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import DrawerMenu from "@/components/DrawerMenu";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,6 +38,7 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className={inter.className}>
         <ServiceWorkerRegister />
+        <DrawerMenu />
 
         <header className="bg-violet-700 text-white p-4 shadow">
           <h1 className="text-xl font-bold text-center">📡 Site Radar</h1>
