@@ -40,7 +40,7 @@ export default function SiteCardPremium({ site }: { site: any }) {
                 </p>
 
                 <p>
-                    <b>Acesso:</b> {site.acesso || "N/A"}
+                    <b>Acesso:</b> {site.detentora || "N/A"}
                 </p>
 
                 <p>
