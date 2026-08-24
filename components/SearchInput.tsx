@@ -22,7 +22,7 @@ export default function SearchInput({ onSearch }: Props) {
       value={value}
       onChange={(e) => setValue(e.target.value)}
       onKeyDown={handleKeyDown}
-      className="w-full p-3 border rounded-xl"
+      className="w-full p-3 border rounded-xl text-purple-700 font-semibold"
     />
   );
 }
